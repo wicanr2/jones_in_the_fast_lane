@@ -108,4 +108,7 @@ SCI_CHT_DEBUG=1 ./scummvm jones   # 印 CHT-HIT/MISS
 - 定位：pic.000 只有 1 個內嵌 cel（cel0，193×165，含 Sierra 球標 + SIERRA PRESENTS + JONES 標題框）。
 - 設計：派 3 個設計師 subagent 並行出稿（忠實 3D 還原 / 現代黑體 / 明體古典戲單），使用者選 **明體古典**（金色粗明體 + 深藍戲單框，呼應「劇場」，保留 Sierra 球標與英文副標致敬）。`tools/redraw_title.py` 自足重跑（由 pic.000 取調色盤與參考 cel → 產 mockup → 呼叫 `sci1_pic.py replace` → `0.p56`）。
 - 交付：`dist/game-cht/0.p56`；實機驗證標題畫面金字清晰。
-- **credits（更正）**：先前誤判「無獨立 credits 畫面」。實測(AppImage 測試時)發現**標題後會自動播一段 credits 動畫序列**——封面美術 + 角色頭銜與人名（Executive Producer Ken Williams…）。人名屬專有名詞(維持原文),但頭銜 label(Executive Producer / Designed by…)仍為英文烘字，屬**未完成長尾**(需定位該序列的 view/text 再處理)。標題 logo pic_0 已完成。
+- **credits 已完成**：標題後自動播的 credits 動畫序列 = **view 1-5**,每個 loop 的 cel0 = 封面美術(165×105,不動)、cel1 = 文字橫幅(頂部洋紅頭銜 idx165 + 下方藍色人名 idx155)。SCI_LOG_GFX 定位;文字非繪製路徑(無 CHT-MISS),是烘字美術。`tools/redraw_credits.py`:偵測頂部洋紅頭銜列(與藍色人名分色),只清頭銜列重畫中文(用頭銜與人名間 gap 放大),人名維持原文(專有名詞)。16 個頭銜 → `1-5.v56`:執行製作/創意總監/製作人/主程式設計/美術/作曲/原始設計/演員。實機驗證。
+
+## 畫面中文化收尾（2026-07-10）
+文字(776 則)+ 全烘字美術(標題 logo、棋盤 13 招牌、14 按鈕、5 畫面標題、目標橫幅+動態字、選單、**開場 credits 頭銜**)。畫面上剩英文僅:人名(專有名詞,credits)、Sierra 球標(品牌)。

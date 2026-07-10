@@ -34,7 +34,7 @@
 ## 待辦 / 開放項目
 
 - **標題 logo pic_0 已完成**＝人生劇場（金色明體戲單風，3 設計師 subagent 出稿、使用者選明體古典；`tools/redraw_title.py` → `0.p56`）。
-- **credits(更正)**：先前誤判「無獨立畫面」；實測發現標題後有 credits 動畫序列(封面美術 + 頭銜/人名)。人名維持原文,頭銜 label 仍英文，屬未完成長尾。
+- **credits 已完成**：標題後 credits 動畫 = view 1-5(cel0 封面/cel1 文字橫幅)。`tools/redraw_credits.py` 把頂部洋紅頭銜列重畫中文(執行製作/創意總監/製作人/主程式設計/美術/作曲/原始設計/演員),藍色人名維持原文 → `1-5.v56`。實機驗證。畫面中文化收尾。
 - **多平台包(2026-07-10)**：Linux AppImage(`docker/Dockerfile.appimage`+`tools/build_appimage.sh`,Wine/實機驗證)、Windows(MXE 靜態 mingw,`Dockerfile.mxe`+`build_windows.sh`,Wine 實跑驗證繁中)、macOS(GitHub Actions `.github/workflows/build-cht.yml`,CI 產 .app/.dmg)。
 - 多平台打包（Win/Mac/Android）：可比照 qog-2 的 CI/cross-compile；目前只做 Linux。
 - 其他長尾（非阻塞）：跑一輪各畫面 `SCI_CHT_DEBUG=1` MISS-collection，補任何殘留含文字 CHT-MISS 進 supplement。（`Goal Points = N` 已由 patch 0004 解決。）
