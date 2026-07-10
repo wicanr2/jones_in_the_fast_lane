@@ -33,8 +33,16 @@ static const char *kChineseFontFile = "jones_big5.fnt";
 // Rendered glyph box: Big5Font glyphs are 16px wide (kChineseTraditionalWidth).
 static const int kBig5Width = 16;
 
+// Hi-res (2x) Big5 font for the 640x400 upscaled display path. Format matches the
+// low-res font but at 32x30: per glyph [u16 BE big5][30 rows * 4 bytes], 0xFFFF end.
+static const char *kChineseHiresFontFile = "jones_big5_hi.fnt";
+static const int kHiWidth = 32;
+static const int kHiHeight = 30;
+static const int kHiRowBytes = kHiWidth / 8;               // 4
+static const int kHiGlyphBytes = kHiHeight * kHiRowBytes;  // 120
+
 GfxFontChinese::GfxFontChinese(ResourceManager *resMan, GfxScreen *screen, GuiResourceId resourceId)
-	: _screen(screen), _resourceId(resourceId), _big5(nullptr), _big5Height(14) {
+	: _screen(screen), _resourceId(resourceId), _big5(nullptr), _big5Height(14), _hiresData(nullptr) {
 	// Original SCI font for single-byte (ASCII / control) glyphs.
 	_asciiFont = new GfxFontFromResource(resMan, screen, resourceId);
 
@@ -46,11 +54,67 @@ GfxFontChinese::GfxFontChinese(ResourceManager *resMan, GfxScreen *screen, GuiRe
 	} else {
 		warning("GfxFontChinese: could not open '%s'; Chinese glyphs will be blank", kChineseFontFile);
 	}
+
+	// Optional hi-res font, only meaningful in the 640x400 upscaled CHT display path.
+	if (_screen->getUpscaledHires() == GFX_SCREEN_UPSCALED_640x400)
+		loadHiresFont();
 }
 
 GfxFontChinese::~GfxFontChinese() {
 	delete _big5;
 	delete _asciiFont;
+	free(_hiresData);
+}
+
+void GfxFontChinese::loadHiresFont() {
+	Common::File f;
+	if (!f.open(kChineseHiresFontFile))
+		return;
+	uint32 size = f.size();
+	_hiresData = (byte *)malloc(size);
+	if (!_hiresData || f.read(_hiresData, size) != size) {
+		free(_hiresData);
+		_hiresData = nullptr;
+		return;
+	}
+	uint32 pos = 0;
+	int count = 0;
+	while (pos + 2 + kHiGlyphBytes <= size) {
+		uint16 code = (_hiresData[pos] << 8) | _hiresData[pos + 1];
+		if (code == 0xFFFF)
+			break;
+		_hiresOff[code] = pos + 2;
+		pos += 2 + kHiGlyphBytes;
+		++count;
+	}
+	debug(1, "GfxFontChinese: loaded %d hi-res glyphs", count);
+}
+
+// Draw a Big5 char at 2x straight into the 640x400 display buffer (crisp CJK).
+bool GfxFontChinese::drawHires(uint16 point, int16 top, int16 left, byte color) {
+	if (!_hiresData)
+		return false;
+	if (!_hiresOff.contains(point))
+		return false;
+	const byte *g = _hiresData + _hiresOff[point];
+	const int16 dispLeft = left * 2;
+	const int16 dispTop = top * 2;
+	const uint16 dw = _screen->getDisplayWidth();
+	const uint16 dh = _screen->getDisplayHeight();
+	for (int gy = 0; gy < kHiHeight; ++gy) {
+		const byte *row = g + gy * kHiRowBytes;
+		const int16 sy = dispTop + gy;
+		if (sy < 0 || sy >= dh)
+			continue;
+		for (int gx = 0; gx < kHiWidth; ++gx) {
+			if (!((row[gx >> 3] >> (7 - (gx & 7))) & 1))
+				continue;
+			const int16 sx = dispLeft + gx;
+			if (sx >= 0 && sx < dw)
+				_screen->putPixelOnDisplay(sx, sy, color);
+		}
+	}
+	return true;
 }
 
 GuiResourceId GfxFontChinese::getResourceId() {
@@ -90,6 +154,11 @@ void GfxFontChinese::draw(uint16 chr, int16 top, int16 left, byte color, bool gr
 
 	// Double-byte: chr == lead | (trail << 8); Big5Font wants (lead << 8) | trail.
 	uint16 point = ((chr & 0xFF) << 8) | (chr >> 8);
+
+	// In the 640x400 CHT display path, draw the glyph crisp at 2x into the display
+	// buffer instead of nearest-upscaling the 16px logical glyph (rule 81).
+	if (_screen->getUpscaledHires() == GFX_SCREEN_UPSCALED_640x400 && drawHires(point, top, left, color))
+		return;
 
 	byte glyph[kBig5Width * 16];
 	memset(glyph, 0, sizeof(glyph));

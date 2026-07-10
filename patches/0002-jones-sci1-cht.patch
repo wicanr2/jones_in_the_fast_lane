@@ -56,3 +56,28 @@
  	return it->_value.c_str();
  }
  
+--- a/b/engines/sci/graphics/screen.cpp	2026-06-20 09:43:09.833596804 +0800
++++ b/engines/sci/graphics/screen.cpp	2026-07-10 19:59:57.086935974 +0800
+@@ -19,6 +19,7 @@
+  *
+  */
+ 
++#define FORBIDDEN_SYMBOL_EXCEPTION_getenv
+ #include "common/config-manager.h"
+ #include "common/util.h"
+ #include "common/system.h"
+@@ -84,6 +85,14 @@
+ 		}
+ 	}
+ 
++	// CHT hi-res: when the Traditional Chinese fan translation is active, run the
++	// display at 640x400 so the Big5 CJK font can be drawn crisp (2x) into the
++	// display buffer instead of being nearest-upscaled from the 320x200 logical
++	// screen. Original art is nearest-upscaled; Chinese text draws hi-res (rule 81).
++	if (_upscaledHires == GFX_SCREEN_UPSCALED_DISABLED &&
++	    (g_sci->getLanguage() == Common::ZH_TWN || getenv("SCI_CHT_HIRES")))
++		_upscaledHires = GFX_SCREEN_UPSCALED_640x400;
++
+ 	// if not yet set, set those to script-width/height
+ 	if (!_width)
+ 		_width = _scriptWidth;

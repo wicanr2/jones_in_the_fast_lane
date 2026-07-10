@@ -22,6 +22,7 @@
 #ifndef SCI_GRAPHICS_FONTCHINESE_H
 #define SCI_GRAPHICS_FONTCHINESE_H
 
+#include "common/hashmap.h"
 #include "sci/graphics/scifont.h"
 
 namespace Graphics {
@@ -59,6 +60,15 @@ private:
 	GfxFontFromResource *_asciiFont; // original SCI font, for single-byte glyphs
 	Graphics::Big5Font *_big5;       // shared Traditional Chinese bitmap font
 	int _big5Height;
+
+	// Hi-res (2x, 32x30) Big5 glyphs for the 640x400 upscaled display path (rule 81).
+	// When the game runs at GFX_SCREEN_UPSCALED_640x400 (CHT mode), these are drawn
+	// straight into the display buffer so Chinese text stays crisp instead of being
+	// nearest-upscaled from the 320x200 logical screen.
+	byte *_hiresData;                        // owns the raw jones_big5_hi.fnt bytes
+	Common::HashMap<uint16, uint32> _hiresOff; // big5 code -> glyph offset in _hiresData
+	void loadHiresFont();
+	bool drawHires(uint16 point, int16 top, int16 left, byte color);
 };
 
 } // End of namespace Sci
