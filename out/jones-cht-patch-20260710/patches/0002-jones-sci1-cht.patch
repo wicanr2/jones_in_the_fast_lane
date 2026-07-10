@@ -29,7 +29,18 @@
  
  	debugC(kDebugLevelStrings, "Formatting \"%s\"", source);
 --- a/b/engines/sci/sci.cpp	2026-07-10 14:46:25.306679011 +0800
-+++ b/engines/sci/sci.cpp	2026-07-10 16:16:13.959123090 +0800
++++ b/engines/sci/sci.cpp	2026-07-10 19:35:13.522002852 +0800
+@@ -296,8 +296,8 @@
+ 	// CHT tooling: dump decompressed text/message/script resources as patch files
+ 	// (uses ScummVM's own SCI decompressor). Triggered by SCI_DUMP_RES=<dir>; quits after.
+ 	if (const char *dumpDir = getenv("SCI_DUMP_RES")) {
+-		const ResourceType dumpTypes[] = { kResourceTypeText, kResourceTypeMessage, kResourceTypeFont, kResourceTypeScript, kResourceTypeHeap, kResourceTypeView, kResourceTypePic };
+-		for (int ti = 0; ti < 7; ++ti) {
++		const ResourceType dumpTypes[] = { kResourceTypeText, kResourceTypeMessage, kResourceTypeFont, kResourceTypeScript, kResourceTypeHeap, kResourceTypeView, kResourceTypePic, kResourceTypeSound, kResourceTypePatch };
++		for (int ti = 0; ti < (int)ARRAYSIZE(dumpTypes); ++ti) {
+ 			Common::List<ResourceId> list = _resMan->listResources(dumpTypes[ti], -1);
+ 			for (Common::List<ResourceId>::iterator it = list.begin(); it != list.end(); ++it) {
+ 				Resource *r = _resMan->findResource(*it, 0);
 @@ -880,8 +880,13 @@
  	if (_chtTranslation.empty() || !original)
  		return nullptr;

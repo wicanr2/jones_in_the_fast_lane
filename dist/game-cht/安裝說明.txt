@@ -8,8 +8,8 @@
    - 11.p56、250.v56、500.v56、501.v56、505.v56、506.v56（棋盤招牌／按鈕／標題烘字）
 4. 在 ScummVM 加入遊戲，設定該 target：
    - 語言（language）＝ Chinese (Traditional)　→ 啟用中文
-   - 音樂驅動（music_driver）＝ PCjr　★重要★
+   - 音樂驅動（music_driver）＝ AdLib　★重要★
 
-★ 關於音樂：Jones 的配樂是 PCjr／Tandy 3 音軌（沒有 AdLib／MT-32 音軌）。
-  若音樂驅動選 AdLib 或 MT-32 會「沒有背景音樂」。請務必選 PCjr（或 Tandy）才聽得到原版配樂。
-  （scummvm.ini 對應 target 加一行：music_driver=pcjr）
+★ 關於音樂：Jones 內建 AdLib（OPL2）與 MT-32 樂器庫（patch.003 / patch.001）。
+  建議音樂驅動選 AdLib（經典 Sierra OPL2 音色）。背景音樂在遊戲棋盤畫面播放。
+  （scummvm.ini 對應 target 加一行：music_driver=adlib）

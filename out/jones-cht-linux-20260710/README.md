@@ -41,7 +41,7 @@ Sierra 1990 年經典**現代都市生活模擬**遊戲的**繁體中文化**專
    - `translation.tsv`、`jones_big5.fnt`（文字＋字型）
    - `11.p56`、`250.v56`、`506.v56`（棋盤招牌／按鈕／橫幅烘字 patch）
 4. 在 ScummVM 加入遊戲，將該 target 設定：語言＝**Chinese (Traditional)**（`language=tw`）啟用中文；
-   音樂驅動＝**PCjr**（`music_driver=pcjr`）。★ Jones 配樂為 PCjr/Tandy 音軌（無 AdLib/MT-32），選錯驅動會沒有背景音樂。
+   音樂驅動＝**AdLib**（`music_driver=adlib`）。★ Jones 內建 AdLib(OPL2)+MT-32 樂器庫,配樂在棋盤畫面播放(經典 Sierra OPL2 音色)。
 
 ## 建置（Docker，SCI-only）
 

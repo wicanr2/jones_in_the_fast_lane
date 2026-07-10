@@ -8,7 +8,7 @@ cp "$HERE/cht/"* "$GAME/"
 INI="$HOME/.config/scummvm/scummvm.ini"
 if [ -f "$INI" ]; then
   sed -i 's/^language=en$/language=tw/' "$INI"
-  # Jones 音樂為 PCjr/Tandy track(無 AdLib/MT-32),需 pcjr driver 才有配樂
-  grep -q '^music_driver=' "$INI" || sed -i '/^\[jones\]/a music_driver=pcjr' "$INI"
+  # Jones 音樂為 AdLib(OPL2)音樂,設 adlib driver
+  grep -q '^music_driver=' "$INI" || sed -i '/^\[jones\]/a music_driver=adlib' "$INI"
 fi
 exec "$HERE/scummvm" jones
