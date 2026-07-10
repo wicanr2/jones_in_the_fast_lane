@@ -33,9 +33,9 @@
 
 ## 待辦 / 開放項目
 
-- 零星未做烘字：開場 credits 人名、標題 logo `pic_0`。（`play fair?`/`go for broke?` 按鈕已中文化＝公平競爭/全力一搏；JONES GOALS 畫面已補完＝瓊斯的目標 + 目標點數，見下。）
+- **標題 logo pic_0 已完成**＝人生劇場（金色明體戲單風，3 設計師 subagent 出稿、使用者選明體古典；`tools/redraw_title.py` → `0.p56`）。**credits 無獨立畫面**（致謝含在已譯版權頁）。畫面中文化收尾。
 - 多平台打包（Win/Mac/Android）：可比照 qog-2 的 CI/cross-compile；目前只做 Linux。
-- M2 長尾：`Goal Points = N` 這類 StrCat 組字仍可能 MISS（可用 `SCI_CHT_DEBUG` MISS-collection 收尾）。
+- 其他長尾（非阻塞）：跑一輪各畫面 `SCI_CHT_DEBUG=1` MISS-collection，補任何殘留含文字 CHT-MISS 進 supplement。（`Goal Points = N` 已由 patch 0004 解決。）
 
 ## § 在別台電腦接續（claude -r）
 

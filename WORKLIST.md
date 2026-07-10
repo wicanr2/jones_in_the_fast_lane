@@ -101,3 +101,11 @@ SCI_CHT_DEBUG=1 ./scummvm jones   # 印 CHT-HIT/MISS
 - **橫幅 `JONES GOALS` → 瓊斯的目標**：provenance trace（`SCI_LOG_GFX`）定位為 **view 506 loop0 cel1**（135×24，與已重繪的 cel0=設定你的目標 同 loop 的另一 cel）。`tools/redraw_506.py` 以 base = 已含 cel0 中文的 `view.506` dump，只換 cel1，重新 encode → `506.v56`。
 - **`Goal Points = 200 !` → 目標點數 = 200 !**：`SCI_CHT_DEBUG` 抓到實際 runtime 為 `kFormat("%s%3d !", "Goal Points = ", 200)`——`%s` 參數才是要翻的字。新增 **patch `0004`**：kFormat 的 `case 's'` 對 `%s` 參數字串也跑 `getChtTranslation`（模板本身在 0002 已翻）。資料端 `translation_full.tsv` 去重（`Goal Points = ` 統一為 目標點數，移除舊 目標分數），重建 runtime + 兩套字型。
 - 兩者皆實機驗證：goals 畫面橫幅、目標點數動態字、完成鈕全繁中且 hi-res 清晰。
+
+## M-hires 標題 logo(2026-07-10 完成)
+
+**pic 0 標題「JONES IN THE FAST LANE」→「人生劇場」**（版權頁後那張經典 Sierra 標題）。
+- 定位：pic.000 只有 1 個內嵌 cel（cel0，193×165，含 Sierra 球標 + SIERRA PRESENTS + JONES 標題框）。
+- 設計：派 3 個設計師 subagent 並行出稿（忠實 3D 還原 / 現代黑體 / 明體古典戲單），使用者選 **明體古典**（金色粗明體 + 深藍戲單框，呼應「劇場」，保留 Sierra 球標與英文副標致敬）。`tools/redraw_title.py` 自足重跑（由 pic.000 取調色盤與參考 cel → 產 mockup → 呼叫 `sci1_pic.py replace` → `0.p56`）。
+- 交付：`dist/game-cht/0.p56`；實機驗證標題畫面金字清晰。
+- **credits**：Jones 在 ScummVM 流程中**無獨立 credits/人名畫面**（版權頁的「設計師、美術、程式設計師、音樂家」致謝已翻譯）。剩餘僅標題 logo pic_0 已完成。畫面文字/美術中文化至此收尾。

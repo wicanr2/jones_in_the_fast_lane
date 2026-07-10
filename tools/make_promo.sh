@@ -26,16 +26,17 @@ kb(){ # $1 png $2 mp4 $3 秒（靜態+淡入淡出，不用 zoompan）
 
 # ===== 分鏡（640×400 hi-res 繁中畫面）=====
 card  "$TMP/00.png" '人生劇場' 'Jones in the Fast Lane' '　Sierra 1990 經典 · 繁體中文化　'
-slide "$TMP/01.png" s_copyright.png '啟動畫面 · 全程繁體中文渲染 · 776 則全譯'
-slide "$TMP/02.png" s_board.png     '棋盤地點招牌 · 640×400 高解析重繪成中文'
-slide "$TMP/03.png" s_playfair.png  '選單 / 對話 · 「公平競爭 / 全力一搏」全繁中'
-slide "$TMP/04.png" s_goals.png     '目標畫面 · 瓊斯的目標 / 目標點數 動態字全譯'
+slide "$TMP/01.png" s_title.png     '標題 logo · 還原經典「人生劇場」中文戲單'
+slide "$TMP/02.png" s_copyright.png '啟動畫面 · 全程繁體中文渲染 · 776 則全譯'
+slide "$TMP/03.png" s_board.png     '棋盤地點招牌 · 640×400 高解析重繪成中文'
+slide "$TMP/04.png" s_playfair.png  '選單 / 對話 · 「公平競爭 / 全力一搏」全繁中'
+slide "$TMP/05.png" s_goals.png     '目標畫面 · 瓊斯的目標 / 目標點數 動態字全譯'
 card  "$TMP/99.png" '人生劇場' 'ScummVM 繁中化 · 免費開源' 'github.com/wicanr2/jones_in_the_fast_lane'
 
 # ===== concat + 配樂 =====
 LIST="$TMP/list.txt"; : > "$LIST"
-declare -A DUR=( [00]=5 [01]=7 [02]=8 [03]=7 [04]=7 [99]=6 )
-for f in 00 01 02 03 04 99; do
+declare -A DUR=( [00]=5 [01]=7 [02]=7 [03]=8 [04]=7 [05]=7 [99]=6 )
+for f in 00 01 02 03 04 05 99; do
   kb "$TMP/$f.png" "$TMP/s_$f.mp4" "${DUR[$f]}"; echo "file '$TMP/s_$f.mp4'" >> "$LIST"
 done
 ffmpeg -y -loglevel error -f concat -safe 0 -i "$LIST" -threads 2 -c:v libx264 -preset veryfast -pix_fmt yuv420p "$TMP/silent.mp4"
