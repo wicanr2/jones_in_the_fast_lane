@@ -12,3 +12,6 @@ __pycache__/
 game/
 dist/qfg1_big5.fnt
 extract/
+out/
+dist-all/
+claude-session/
