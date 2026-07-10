@@ -66,13 +66,12 @@ jobs:
             ./configure --disable-all-engines --enable-engine=sci --disable-mt32emu \
                         --enable-release --with-sdl-prefix="$P" >/tmp/sv_conf.log 2>&1 || { tail -40 /tmp/sv_conf.log; exit 1; }
           grep -iE 'Backend|engines to|SDL' /tmp/sv_conf.log | head
-          echo "$(date +%H:%M:%S) make(動態,不用 scummvm-static:它要 libz.a/libbz2.a 靜態庫 brew 沒給)"
-          make -j$(sysctl -n hw.ncpu) >/tmp/sv_make.log 2>&1 || { tail -50 /tmp/sv_make.log; exit 1; }
-          echo "$(date +%H:%M:%S) make bundle-pack(只建 .app 骨架:Info.plist/icon/themes/enginedata)"
+          echo "$(date +%H:%M:%S) make(動態:scummvm-static 要 libz.a/libbz2.a 靜態庫 brew 沒給)"
+          make -j$(sysctl -n hw.ncpu) scummvm >/tmp/sv_make.log 2>&1 || { tail -50 /tmp/sv_make.log; exit 1; }
+          # bundle-pack target 內部有 `cp scummvm-static ...`;用動態 binary 冒名滿足它,避開靜態連結
+          cp scummvm scummvm-static
+          echo "$(date +%H:%M:%S) make bundle-pack(建 .app:Info.plist/icon/themes/enginedata + 塞 binary)"
           make bundle-pack >/tmp/sv_bundle.log 2>&1 || { tail -40 /tmp/sv_bundle.log; exit 1; }
-          # 手動把「動態」scummvm binary 塞進 .app(bundle target 原本 cp 的是 scummvm-static)
-          cp scummvm ScummVM.app/Contents/MacOS/scummvm
-          chmod 755 ScummVM.app/Contents/MacOS/scummvm
           echo "$(date +%H:%M:%S) bundle-pack done"; ls -la ScummVM.app/Contents/MacOS/
 
       - name: Assemble .app (bundle dylibs) + CHT data + dmg/tar.gz
