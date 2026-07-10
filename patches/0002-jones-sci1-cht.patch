@@ -1,0 +1,47 @@
+--- a/b/engines/advancedDetector.cpp	2026-06-20 09:43:09.137596997 +0800
++++ b/engines/advancedDetector.cpp	2026-07-10 16:13:19.830714918 +0800
+@@ -785,6 +785,10 @@
+ 		// language and platform (if specified).
+ 		if ((language != Common::UNK_LANG && g->language != Common::UNK_LANG && g->language != language
+ 		     && !(language == Common::EN_ANY && (g->flags & ADGF_ADDENGLISH))
++		     // Traditional Chinese fan translation: allow a ZH_TWN request to match an
++		     // English (EN_ANY) game entry, so the CHT patch can be applied on top of the
++		     // original English game without a dedicated detection entry.
++		     && !(language == Common::Language::ZH_TWN && g->language == Common::EN_ANY)
+ 		     && !(language == Common::Language::ZH_CHN && g->language == Common::Language::ZH_TWN && (_flags & kADFlagCanTranscodeTraditionalChineseToSimplified))) ||
+ 			(platform != Common::kPlatformUnknown && g->platform != Common::kPlatformUnknown && g->platform != platform)) {
+ 			continue;
+--- a/b/engines/sci/engine/kstring.cpp	2026-06-20 09:43:09.820596808 +0800
++++ b/engines/sci/engine/kstring.cpp	2026-07-10 16:38:25.071076467 +0800
+@@ -249,6 +249,14 @@
+ 
+ 	int index = (startarg == 3) ? argv[2].toUint16() : 0;
+ 	Common::String source_str = g_sci->getKernel()->lookupText(position, index);
++	// Traditional Chinese fan translation: translate the format TEMPLATE (which still
++	// contains %-directives) before substitution, so dynamic strings like "Week #%2d"
++	// render as "第 %2d 週" -> "第  1 週".
++	if (g_sci->getLanguage() == Common::ZH_TWN) {
++		const char *tr = g_sci->getChtTranslation(source_str.c_str());
++		if (tr)
++			source_str = tr;
++	}
+ 	const char* source = source_str.c_str();
+ 
+ 	debugC(kDebugLevelStrings, "Formatting \"%s\"", source);
+--- a/b/engines/sci/sci.cpp	2026-07-10 14:46:25.306679011 +0800
++++ b/engines/sci/sci.cpp	2026-07-10 16:16:13.959123090 +0800
+@@ -880,8 +880,13 @@
+ 	if (_chtTranslation.empty() || !original)
+ 		return nullptr;
+ 	Common::HashMap<Common::String, Common::String>::const_iterator it = _chtTranslation.find(original);
+-	if (it == _chtTranslation.end())
++	if (it == _chtTranslation.end()) {
++		if (getenv("SCI_CHT_DEBUG"))
++			warning("CHT-MISS[%d]:%s", (int)strlen(original), original);
+ 		return nullptr;
++	}
++	if (getenv("SCI_CHT_DEBUG"))
++		warning("CHT-HIT[%d]:%s", (int)strlen(original), original);
+ 	return it->_value.c_str();
+ }
+ 

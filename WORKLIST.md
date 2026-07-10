@@ -10,8 +10,8 @@ repo：`github.com/wicanr2/jones_in_the_fast_lane`。工作目錄 `~/scummvm/jon
 | M0 可行性 + 骨架 | ✅ 偵測/dump/抽字打通，術語表建於 `docs/10-terminology.md` |
 | **M1 端到端 spike** | ✅ **版權畫面繁中渲染實機驗證**（`docs/images/m1-spike-copyright-cht.png`，CHT-HIT） |
 | **M2 全文字中文化** | ✅ **776 則翻譯**(773 靜態+3 supplement)；商店/大學對白+動態「第N週」實機驗證；長尾見下 |
-| **M3 烘字 UI（view/pic）** | 🔨 進行中：SCI1 view **decoder 完成+驗證(725/752 pixel-perfect)**；encoder/重繪/pic 待做（`docs/40-baked-art.md`） |
-| M4 多平台打包 + README | 🔲 未開始 |
+| **M3 烘字 UI（view/pic）** | ✅ 主體：SCI1 view+pic codec 完成驗證；棋盤 12+ 招牌、14 按鈕、目標橫幅重繪實機驗證。零星標題/credits/logo 待補 |
+| **M4 打包 + README** | 🔨 引擎 patch(0001+0002)+CHT 資料包(dist/game-cht)+圖文 README 完成；push GitHub |
 
 ## 引擎改動（相對 qfg-1 base，Jones 專屬）
 
