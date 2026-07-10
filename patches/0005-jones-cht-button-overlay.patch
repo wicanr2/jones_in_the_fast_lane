@@ -1,0 +1,124 @@
+--- a/engines/sci/graphics/view.cpp	2026-07-11 00:22:22.500384117 +0800
++++ b/engines/sci/graphics/view.cpp	2026-07-11 00:22:22.500546873 +0800
+@@ -21,6 +21,8 @@
+ 
+ #define FORBIDDEN_SYMBOL_EXCEPTION_getenv
+ #include "common/file.h"
++#include "common/hashmap.h"
++#include "common/array.h"
+ #include "sci/sci.h"
+ #include "sci/engine/state.h"
+ #include "sci/graphics/drivers/gfxdriver.h"
+@@ -819,6 +821,99 @@
+ 	}
+ }
+ 
++// CHT hi-res button overlay: view 250 = 14 個動作按鈕(32x9 logical),烘字在 9px 被 2x
++// nearest 放大 → 塊狀糊(rule 81)。ZH_TWN + 640x400 hi-res 時,用面色蓋掉按鈕內烘字、
++// 再以原生 16px 字型(jones_btn.fnt)在 display buffer 直繪清晰中文標籤(jones_buttons.dat)。
++static void drawChtButtonOverlay(GfxScreen *screen, int16 resourceId, int16 loopNo,
++                                 const Common::Rect &rect, int16 celWidth, int16 celHeight) {
++	if (resourceId != 250 || loopNo < 0)
++		return;
++	static bool s_tried = false;
++	static byte *s_font = nullptr;
++	static Common::HashMap<uint16, uint32> s_off;
++	static Common::Array<byte> s_data;
++	if (!s_tried) {
++		s_tried = true;
++		Common::File ff;
++		if (ff.open("jones_btn.fnt")) {
++			uint32 sz = ff.size();
++			s_font = (byte *)malloc(sz);
++			if (s_font && (uint32)ff.read(s_font, sz) == sz) {
++				uint32 p = 0;
++				while (p + 2 + 32 <= sz) {
++					uint16 code = (s_font[p] << 8) | s_font[p + 1];
++					if (code == 0xFFFF)
++						break;
++					s_off[code] = p + 2;
++					p += 2 + 32;
++				}
++			} else {
++				free(s_font);
++				s_font = nullptr;
++			}
++		}
++		Common::File df;
++		if (df.open("jones_buttons.dat")) {
++			uint32 sz = df.size();
++			s_data.resize(sz);
++			df.read(s_data.begin(), sz);
++		}
++	}
++	if (!s_font || s_data.empty())
++		return;
++	const byte *p = s_data.begin();
++	const byte *end = s_data.end();
++	int count = *p++;
++	if (loopNo >= count)
++		return;
++	for (int i = 0; i < loopNo; i++) {   // 跳到 loopNo 的記錄
++		if (p + 3 > end)
++			return;
++		p += 3 + p[2] * 2;
++	}
++	if (p + 3 > end)
++		return;
++	byte face = p[0], fg = p[1];
++	int n = p[2];
++	p += 3;
++	if (n == 0)
++		return;
++	const int dw = screen->getDisplayWidth(), dh = screen->getDisplayHeight();
++	const int dx0 = rect.left * 2, dy0 = rect.top * 2;
++	const int bw = celWidth * 2, bh = celHeight * 2;
++	// 面色蓋掉按鈕內烘字(留邊框)
++	for (int y = 4; y < bh - 2; y++)
++		for (int x = 6; x < bw - 6; x++) {
++			int sx = dx0 + x, sy = dy0 + y;
++			if (sx >= 0 && sx < dw && sy >= 0 && sy < dh)
++				screen->putPixelOnDisplay(sx, sy, face);
++		}
++	// 原生 16x16 清晰字直繪,置中
++	const int GW = 16, GH = 16, ROWB = 2;
++	int gx0 = dx0 + (bw - n * GW) / 2;
++	int gy0 = dy0 + (bh - GH) / 2;
++	for (int i = 0; i < n && p + 2 <= end; i++, p += 2) {
++		uint16 code = (p[0] << 8) | p[1];
++		if (!s_off.contains(code))
++			continue;
++		const byte *g = s_font + s_off[code];
++		int cx = gx0 + i * GW;
++		for (int gy = 0; gy < GH; gy++) {
++			const byte *row = g + gy * ROWB;
++			int sy = gy0 + gy;
++			if (sy < 0 || sy >= dh)
++				continue;
++			for (int gxx = 0; gxx < GW; gxx++) {
++				if (!((row[gxx >> 3] >> (7 - (gxx & 7))) & 1))
++					continue;
++				int sx = cx + gxx;
++				if (sx >= 0 && sx < dw)
++					screen->putPixelOnDisplay(sx, sy, fg);
++			}
++		}
++	}
++}
++
+ void GfxView::draw(const Common::Rect &rect, const Common::Rect &clipRect, const Common::Rect &clipRectTranslated,
+ 			int16 loopNo, int16 celNo, byte priority, uint16 EGAmappingNr, bool upscaledHires, uint16 scaleSignal) {
+ 	const Palette *palette = _embeddedPal ? &_viewPalette : &_palette->_sysPalette;
+@@ -896,6 +991,12 @@
+ 
+ 	// Reset custom per-view palette mod
+ 	_screen->setCurPaletteMapValue(oldpalvalue);
++
++	// CHT:view 250 動作按鈕 hi-res 疊繪清晰中文(取代 32x9 烘字 2x 放大的塊狀)。
++	// 用 clipRectTranslated(螢幕絕對 logical 座標)定位,rect 是 port 相對的會偏掉。
++	if (g_sci->getLanguage() == Common::ZH_TWN &&
++	    _screen->getUpscaledHires() == GFX_SCREEN_UPSCALED_640x400)
++		drawChtButtonOverlay(_screen, _resourceId, loopNo, clipRectTranslated, celWidth, celHeight);
+ }
+ 
+ void GfxView::drawScaled(const Common::Rect &rect, const Common::Rect &clipRect, const Common::Rect &clipRectTranslated,

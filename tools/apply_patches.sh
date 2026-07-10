@@ -20,6 +20,8 @@ $P -p1 -d "$SRC" < "$HERE/patches/0002-jones-sci1-cht.patch"
 $P -p1 -d "$SRC" < "$HERE/patches/0003-jones-hires-signs.patch"
 # 0004:kFormat 的 %s 參數字串也翻譯(StrCat 組字如「Goal Points = 200 !」前綴中文化)
 $P -p1 -d "$SRC" < "$HERE/patches/0004-jones-cht-format-argstr.patch"
+# 0005:view 250 動作按鈕 hi-res 疊繪清晰中文(取代 32x9 烘字 2x 放大塊狀)
+$P -p1 -d "$SRC" < "$HERE/patches/0005-jones-cht-button-overlay.patch"
 
 echo ">> 已套用。configure 範例(docker 內):"
 echo "   ./configure --disable-all-engines --enable-engine=sci --disable-detection-full --disable-mt32emu"
