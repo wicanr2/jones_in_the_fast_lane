@@ -4,8 +4,13 @@
 1. 準備 Jones in the Fast Lane（DOS/English）原版遊戲檔（含 resource.map / resource.001 / resource.002…）。
 2. 使用支援繁中的 ScummVM（本專案提供的 Linux 執行包，或自行套 patch 建置）。
 3. 把本資料夾內全部檔案複製到遊戲目錄：
-   - translation.tsv、jones_big5.fnt（文字＋字型）
-   - 11.p56、250.v56、500.v56、501.v56、505.v56、506.v56（棋盤招牌／按鈕／標題烘字）
+   - translation.tsv、jones_big5.fnt（文字＋低解字型）
+   - jones_big5_hi.fnt（640x400 hi-res 32x30 字型，中文更清晰）
+   - jones_signs.dat（棋盤招牌中文疊繪座標／顏色資料）
+   - 10.v56、11.p56、250.v56、500.v56、501.v56、505.v56、506.v56（棋盤招牌／按鈕／標題烘字）
+
+   ★ 繁中模式會自動切到 640x400 hi-res 畫布：中文字以 2x 直接繪入顯示緩衝（清晰不糊），
+     棋盤招牌（pic 11）則以 jones_big5_hi.fnt + jones_signs.dat 疊上清晰中文。無需額外設定。
 4. 在 ScummVM 加入遊戲，設定該 target：
    - 語言（language）＝ Chinese (Traditional)　→ 啟用中文
    - 音樂驅動（music_driver）＝ AdLib　★重要★

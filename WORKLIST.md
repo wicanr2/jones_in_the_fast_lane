@@ -87,3 +87,15 @@ SCI_CHT_DEBUG=1 ./scummvm jones   # 印 CHT-HIT/MISS
 - `Goal Points = 200 !` 這類 **StrCat 組字**（靜態前綴+數字連接後才繪）仍可能 MISS——已補 `Goal Points = ` 前綴，待實測。
 - 純格式片段 `%d!`/`%s!`（無可譯文字，產出數字，無需翻）。
 - **完整性 gate**：跑一輪各畫面 `SCI_CHT_DEBUG=1` 收集所有含文字的 CHT-MISS，補進 supplement。此為 M2 最終驗收，安排在 M3 實機 playtest 一併做。
+
+## M-hires:640×400 高解析中文（2026-07-10 完成）
+
+引擎在 ZH_TWN 自動切 `GFX_SCREEN_UPSCALED_640x400`（`screen.cpp`），art 仍 2x nearest 放大，但**中文字改以 2x 直接繪入 display buffer** 保持清晰（rule 81）。
+
+- **Part 1｜文字 hi-res**：`jones_big5_hi.fnt`（32×30，1310 字，`build_cht_hires.py` 由 wqy-zenhei 28px 烘）。`fontchinese.cpp` 的 `drawHires()` 逐字 2x 繪入 → 版權頁/對白/選單中文清晰不糊。
+- **Part 2｜棋盤招牌疊繪**：`paint16.cpp` 的 `drawChtBoardSigns()`——drawPicture 畫完 pic 11 後，讀 `jones_signs.dat`（13 筆招牌座標/顏色/中文，`tools/gen_signs.py` 產）＋ `jones_big5_hi.fnt`，把各招牌英文帶填底色再疊清晰中文（字形縮放貼合小招牌帶）。**座標已烘成 hi-res 640×400 pixel（logical ×2），引擎端不再乘 2**。
+- **patch**：新增 `patches/0003-jones-hires-signs.patch`（paint16 疊繪），`apply_patches.sh` 依序套 0001→0002→0003。
+- **play-fair 對話框**：`公平競爭 / 全力一搏` 已中文化（M3 view.010 一併）。
+
+### M-hires 已知長尾
+- **JONES GOALS 畫面**：頂部橫幅 `JONES GOALS` 仍為英文烘圖（獨立 baked-art，非已重繪的 500/501/505/506）；`Goal Points = %d` 動態字仍 EN（StrCat 組字，kFormat hook 未攔到）。此畫面為週初設定人生目標（財富/快樂/學歷/職業四滑桿）——需另做一輪 RE 定位該 view/cel 再重繪，留待後續。

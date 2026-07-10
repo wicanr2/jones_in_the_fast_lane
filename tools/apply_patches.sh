@@ -12,8 +12,10 @@ cp "$HERE/patches/fontchinese.cpp" "$SRC/engines/sci/graphics/fontchinese.cpp"
 # 既有檔 diff
 # 0001:SCI 繁中化引擎 base(GfxFontChinese、text16 hook、getLanguage、dump hook)
 patch -p0 -d "$SRC" < "$HERE/patches/0001-sci-cht-zh_twn.patch"
-# 0002:Jones/SCI1 專屬(detector ZH_TWN→EN_ANY 例外、kFormat 動態字 hook、SCI_CHT_DEBUG)
+# 0002:Jones/SCI1 專屬(detector ZH_TWN→EN_ANY 例外、kFormat 動態字 hook、SCI_CHT_DEBUG、640x400 hi-res 字型)
 patch -p1 -d "$SRC" < "$HERE/patches/0002-jones-sci1-cht.patch"
+# 0003:640x400 hi-res 棋盤招牌疊繪(drawChtBoardSigns，讀 jones_big5_hi.fnt / jones_signs.dat)
+patch -p1 -d "$SRC" < "$HERE/patches/0003-jones-hires-signs.patch"
 
 echo ">> 已套用。configure 範例(docker 內):"
 echo "   ./configure --disable-all-engines --enable-engine=sci --disable-detection-full --disable-mt32emu"

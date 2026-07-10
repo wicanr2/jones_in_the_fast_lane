@@ -1,0 +1,117 @@
+--- a/engines/sci/graphics/paint16.cpp	2026-07-10 20:21:30.794060119 +0800
++++ b/engines/sci/graphics/paint16.cpp	2026-07-10 20:21:30.794150842 +0800
+@@ -21,6 +21,7 @@
+ 
+ #define FORBIDDEN_SYMBOL_EXCEPTION_getenv
+ #include "common/file.h"
++#include "common/hashmap.h"
+ #include "sci/sci.h"
+ #include "sci/engine/features.h"
+ #include "sci/engine/state.h"
+@@ -89,6 +90,93 @@
+ 	_EGAdrawingVisualize = state;
+ }
+ 
++// CHT hi-res board signs: overlay crisp Big5 sign labels onto the 640x400 display
++// buffer for the board pic, so store signs stay sharp instead of blocky nearest-
++// upscaled pic art (rule 81). Data files (jones_big5_hi.fnt / jones_signs.dat) ship
++// with the CHT patch. Glyphs are scaled to fit each (small) sign band.
++static void drawChtBoardSigns(GfxScreen *screen) {
++	static bool s_tried = false;
++	static byte *s_hiFont = nullptr;
++	static Common::HashMap<uint16, uint32> s_hiOff;
++	static Common::Array<byte> s_signs;
++	if (!s_tried) {
++		s_tried = true;
++		Common::File ff;
++		if (ff.open("jones_big5_hi.fnt")) {
++			uint32 sz = ff.size();
++			s_hiFont = (byte *)malloc(sz);
++			if (s_hiFont && (uint32)ff.read(s_hiFont, sz) == sz) {
++				uint32 p = 0;
++				while (p + 2 + 120 <= sz) {
++					uint16 code = (s_hiFont[p] << 8) | s_hiFont[p + 1];
++					if (code == 0xFFFF)
++						break;
++					s_hiOff[code] = p + 2;
++					p += 2 + 120;
++				}
++			} else {
++				free(s_hiFont);
++				s_hiFont = nullptr;
++			}
++		}
++		Common::File sf;
++		if (sf.open("jones_signs.dat")) {
++			uint32 sz = sf.size();
++			s_signs.resize(sz);
++			sf.read(s_signs.begin(), sz);
++		}
++	}
++	if (!s_hiFont || s_signs.empty())
++		return;
++
++	const int dw = screen->getDisplayWidth(), dh = screen->getDisplayHeight();
++	const byte *p = s_signs.begin();
++	const byte *end = s_signs.end();
++	int count = *p++;
++	for (int s = 0; s < count && p + 11 <= end; s++) {
++		int x = p[0] | (p[1] << 8), y = p[2] | (p[3] << 8);
++		int w = p[4] | (p[5] << 8), bh = p[6] | (p[7] << 8);
++		byte bg = p[8], fg = p[9];
++		int n = p[10];
++		p += 11;
++		// Coords are already hi-res 640x400 display pixels (baked ×2 in jones_signs.dat).
++		const int dx0 = x, dy0 = y, dyw = w, dhh = bh;
++		for (int dy = 0; dy < dhh && dy0 + dy < dh; dy++)
++			for (int dx = 0; dx < dyw && dx0 + dx < dw; dx++)
++				if (dx0 + dx >= 0 && dy0 + dy >= 0)
++					screen->putPixelOnDisplay(dx0 + dx, dy0 + dy, bg);
++		// Scale glyphs so the whole label fits the band width and height.
++		int cellW = (n > 0) ? MIN(32, dyw / n) : 0;
++		int cellH = MIN(30, dhh - 2);
++		if (cellW < 4 || cellH < 4) { p += n * 2; continue; }
++		int labelW = cellW * n;
++		int sx0 = dx0 + (dyw - labelW) / 2;
++		int sy0 = dy0 + (dhh - cellH) / 2;
++		for (int i = 0; i < n && p + 2 <= end; i++, p += 2) {
++			uint16 code = (p[0] << 8) | p[1];
++			if (!s_hiOff.contains(code))
++				continue;
++			const byte *g = s_hiFont + s_hiOff[code];
++			int cx = sx0 + i * cellW;
++			for (int oy = 0; oy < cellH; oy++) {
++				int gy = oy * 30 / cellH;
++				const byte *row = g + gy * 4;
++				int sy = sy0 + oy;
++				if (sy < 0 || sy >= dh)
++					continue;
++				for (int ox = 0; ox < cellW; ox++) {
++					int gx = ox * 32 / cellW;
++					if (!((row[gx >> 3] >> (7 - (gx & 7))) & 1))
++						continue;
++					int sx = cx + ox;
++					if (sx >= 0 && sx < dw)
++						screen->putPixelOnDisplay(sx, sy, fg);
++				}
++			}
++		}
++	}
++}
++
+ void GfxPaint16::drawPicture(GuiResourceId pictureId, bool mirroredFlag, bool addToFlag, GuiResourceId paletteId) {
+ 	if (getenv("SCI_LOG_GFX"))
+ 		warning("SCI_LOG_GFX drawPicture pic=%d", pictureId);
+@@ -111,6 +199,12 @@
+ 	// Reset custom per-picture palette mod
+ 	_screen->setCurPaletteMapValue(0);
+ 
++	// CHT hi-res: overlay crisp Chinese sign labels onto the board (pic 11) in the
++	// 640x400 upscaled display path, so store signs stay sharp (rule 81).
++	if (pictureId == 11 && g_sci->getLanguage() == Common::ZH_TWN &&
++	    _screen->getUpscaledHires() == GFX_SCREEN_UPSCALED_640x400)
++		drawChtBoardSigns(_screen);
++
+ 	// CHT tooling: dump each drawn pic (display buffer + palette) as PPM, to identify
+ 	// which resource holds baked-art UI labels. Triggered by SCI_DUMP_PIC=<dir>.
+ 	if (const char *dir = getenv("SCI_DUMP_PIC")) {
