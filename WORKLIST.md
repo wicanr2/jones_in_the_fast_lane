@@ -97,5 +97,7 @@ SCI_CHT_DEBUG=1 ./scummvm jones   # 印 CHT-HIT/MISS
 - **patch**：新增 `patches/0003-jones-hires-signs.patch`（paint16 疊繪），`apply_patches.sh` 依序套 0001→0002→0003。
 - **play-fair 對話框**：`公平競爭 / 全力一搏` 已中文化（M3 view.010 一併）。
 
-### M-hires 已知長尾
-- **JONES GOALS 畫面**：頂部橫幅 `JONES GOALS` 仍為英文烘圖（獨立 baked-art，非已重繪的 500/501/505/506）；`Goal Points = %d` 動態字仍 EN（StrCat 組字，kFormat hook 未攔到）。此畫面為週初設定人生目標（財富/快樂/學歷/職業四滑桿）——需另做一輪 RE 定位該 view/cel 再重繪，留待後續。
+### M-hires JONES GOALS 畫面(2026-07-10 補完)
+- **橫幅 `JONES GOALS` → 瓊斯的目標**：provenance trace（`SCI_LOG_GFX`）定位為 **view 506 loop0 cel1**（135×24，與已重繪的 cel0=設定你的目標 同 loop 的另一 cel）。`tools/redraw_506.py` 以 base = 已含 cel0 中文的 `view.506` dump，只換 cel1，重新 encode → `506.v56`。
+- **`Goal Points = 200 !` → 目標點數 = 200 !**：`SCI_CHT_DEBUG` 抓到實際 runtime 為 `kFormat("%s%3d !", "Goal Points = ", 200)`——`%s` 參數才是要翻的字。新增 **patch `0004`**：kFormat 的 `case 's'` 對 `%s` 參數字串也跑 `getChtTranslation`（模板本身在 0002 已翻）。資料端 `translation_full.tsv` 去重（`Goal Points = ` 統一為 目標點數，移除舊 目標分數），重建 runtime + 兩套字型。
+- 兩者皆實機驗證：goals 畫面橫幅、目標點數動態字、完成鈕全繁中且 hi-res 清晰。

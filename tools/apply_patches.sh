@@ -16,6 +16,8 @@ patch -p0 -d "$SRC" < "$HERE/patches/0001-sci-cht-zh_twn.patch"
 patch -p1 -d "$SRC" < "$HERE/patches/0002-jones-sci1-cht.patch"
 # 0003:640x400 hi-res 棋盤招牌疊繪(drawChtBoardSigns，讀 jones_big5_hi.fnt / jones_signs.dat)
 patch -p1 -d "$SRC" < "$HERE/patches/0003-jones-hires-signs.patch"
+# 0004:kFormat 的 %s 參數字串也翻譯(StrCat 組字如「Goal Points = 200 !」前綴中文化)
+patch -p1 -d "$SRC" < "$HERE/patches/0004-jones-cht-format-argstr.patch"
 
 echo ">> 已套用。configure 範例(docker 內):"
 echo "   ./configure --disable-all-engines --enable-engine=sci --disable-detection-full --disable-mt32emu"

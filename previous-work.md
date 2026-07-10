@@ -8,7 +8,8 @@
 - **M0–M4 + M-hires 完成**（HEAD `667cfdf`）。文字 100% 繁中（776 則）；烘字美術主體（棋盤 13 招牌、14 按鈕、5 畫面標題、目標橫幅、公平競爭/全力一搏選單）重繪並實機驗證。
 - 自寫 **SCI1 view+pic 編解碼器**（`tools/sci1_view.py` / `sci1_pic.py`）：decode 對引擎 oracle 725/752 pixel-perfect、RLE roundtrip 15/15。
 - **640×400 hi-res 中文（rule 81）**：ZH_TWN 自動切 `GFX_SCREEN_UPSCALED_640x400`。Part1＝文字 2x 直繪 display buffer（`fontchinese.cpp` drawHires + `jones_big5_hi.fnt` 32×30）；Part2＝棋盤招牌疊繪（`paint16.cpp` drawChtBoardSigns + `jones_signs.dat`，座標烘 hi-res x2）。
-- 引擎 patch：`patches/0001`（SCI 繁中 base，沿用 qfg-1）+ `patches/0002`（Jones/SCI1：detector 例外、kFormat hook、hi-res 字型、SCI_CHT_DEBUG）+ `patches/0003`（棋盤招牌疊繪）+ `patches/fontchinese.{h,cpp}`。apply 序 0001→0002→0003。
+- **JONES GOALS 畫面補完**：橫幅 → 瓊斯的目標（view 506 loop0 cel1 重繪，`redraw_506.py`）；`Goal Points = 200 !` → 目標點數 = 200 !（`kFormat` 的 `%s` 參數也翻譯，patch 0004 + `translation_full.tsv` 去重）。
+- 引擎 patch：`patches/0001`（SCI 繁中 base，沿用 qfg-1）+ `patches/0002`（Jones/SCI1：detector 例外、kFormat 模板 hook、hi-res 字型、SCI_CHT_DEBUG）+ `patches/0003`（棋盤招牌疊繪）+ `patches/0004`（kFormat %s 參數翻譯）+ `patches/fontchinese.{h,cpp}`。apply 序 0001→0002→0003→0004。
 - 打包：`out/jones-cht-{patch,data,linux}-*.tar.gz` + 推廣影片 `out/jones-cht-promo.mp4`（hi-res 截圖 + 原版 AdLib 配樂）。
 
 ## 本次做的工作（依主題）
@@ -32,8 +33,7 @@
 
 ## 待辦 / 開放項目
 
-- **JONES GOALS 畫面**：頂部橫幅 `JONES GOALS` 仍英文烘圖 + `Goal Points = %d` 動態字 EN（StrCat 組字，kFormat 未攔到）。需另做一輪 RE 定位該 view/cel 再重繪（見 WORKLIST「M-hires 已知長尾」）。
-- 零星未做烘字：開場 credits 人名、標題 logo `pic_0`。（`play fair?`/`go for broke?` 按鈕已中文化＝公平競爭/全力一搏。）
+- 零星未做烘字：開場 credits 人名、標題 logo `pic_0`。（`play fair?`/`go for broke?` 按鈕已中文化＝公平競爭/全力一搏；JONES GOALS 畫面已補完＝瓊斯的目標 + 目標點數，見下。）
 - 多平台打包（Win/Mac/Android）：可比照 qog-2 的 CI/cross-compile；目前只做 Linux。
 - M2 長尾：`Goal Points = N` 這類 StrCat 組字仍可能 MISS（可用 `SCI_CHT_DEBUG` MISS-collection 收尾）。
 

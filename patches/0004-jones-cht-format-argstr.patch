@@ -1,0 +1,18 @@
+--- a/engines/sci/engine/kstring.cpp	2026-07-10 20:59:32.290888615 +0800
++++ b/engines/sci/engine/kstring.cpp	2026-07-10 20:59:32.291163715 +0800
+@@ -319,6 +319,15 @@
+ 
+ 				Common::String tempsource = g_sci->getKernel()->lookupText(reg,
+ 				                                  arguments[paramindex + 1]);
++				// Traditional Chinese: also translate the %s ARGUMENT string, so
++				// StrCat-style dynamic lines composed as e.g. "%s%3d !" with the
++				// literal prefix passed as %s (like "Goal Points = 200 !") get their
++				// prefix localized. The template itself is translated above.
++				if (g_sci->getLanguage() == Common::ZH_TWN) {
++					const char *tr = g_sci->getChtTranslation(tempsource.c_str());
++					if (tr)
++						tempsource = tr;
++				}
+ 				int slen = tempsource.size();
+ 				int extralen = strLength - slen;
+ 				assert((target - targetbuf) + extralen <= maxsize);
