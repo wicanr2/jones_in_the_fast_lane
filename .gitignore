@@ -1,7 +1,4 @@
 # 原遊戲資源不入庫(版權)
-extract/game_lc/
-extract/dump/
-extract/shots/
 *.zip
 *.rar
 manual/珍076-人生劇場/
@@ -14,3 +11,4 @@ __pycache__/
 # runtime 產物(可由 build_cht.py 重建;字型/tsv 保留在 dist? 交付需要)
 game/
 dist/qfg1_big5.fnt
+extract/
