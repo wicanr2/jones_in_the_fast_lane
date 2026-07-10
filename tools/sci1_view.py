@@ -124,6 +124,124 @@ def _save_png(cel, palette, path):
     img.save(path)
 
 
+def _pack_u16(v): return bytes((v & 0xFF, (v >> 8) & 0xFF))
+
+
+def encode_uncompressed(v, replacements=None):
+    """把 SCI1View 以未壓縮重建成 resource data(bytes)。
+    replacements: {(loop,cel): index_bitmap_bytearray}。保留 mirrorBits/palette。"""
+    replacements = replacements or {}
+    L = v.loop_count
+    # 佈局:8(header)+2*L(loop offset 表) 後接各 loop header,再各 cel,再 palette
+    pos = 8 + 2 * L
+    loop_off = []
+    for li, cels in enumerate(v.loops):
+        loop_off.append(pos)
+        pos += 4 + 2 * len(cels)
+    cel_off = {}
+    for li, cels in enumerate(v.loops):
+        for ci, c in enumerate(cels):
+            cel_off[(li, ci)] = pos
+            pos += 8 + c.w * c.h
+    pal_off = pos if v.palette is not None else 0
+
+    out = bytearray(pos + (0 if v.palette is None else 260 + 256 * 4))
+    out[0] = L
+    out[1] = 0x40 | (0x80 if v.palette is not None else 0)  # 未壓縮(+有palette)
+    out[2:4] = _pack_u16(v.mirror_bits)
+    out[4:6] = _pack_u16(0)
+    out[6:8] = _pack_u16(pal_off)
+    for li in range(L):
+        out[8 + li * 2:10 + li * 2] = _pack_u16(loop_off[li])
+    for li, cels in enumerate(v.loops):
+        lo = loop_off[li]
+        out[lo:lo+2] = _pack_u16(len(cels))
+        out[lo+2:lo+4] = _pack_u16(0)
+        for ci, c in enumerate(cels):
+            out[lo + 4 + ci * 2:lo + 6 + ci * 2] = _pack_u16(cel_off[(li, ci)])
+    for li, cels in enumerate(v.loops):
+        for ci, c in enumerate(cels):
+            co = cel_off[(li, ci)]
+            out[co:co+2] = _pack_u16(c.w)
+            out[co+2:co+4] = _pack_u16(c.h)
+            out[co+4] = c.dx & 0xFF
+            out[co+5] = c.dy
+            out[co+6] = c.clear
+            out[co+7] = 0
+            bmp = replacements.get((li, ci), c.bitmap)
+            out[co+8:co+8 + c.w * c.h] = bytes(bmp[:c.w * c.h])
+    if v.palette is not None:
+        # VARIABLE 格式:palOffset+260 起,每色 4 bytes(used=1,r,g,b)
+        base = pal_off + 260
+        # 前 260 bytes header:標記 SCI0/SCI1 palette(data[0]=0,data[1]=1)
+        out[pal_off] = 0
+        out[pal_off + 1] = 1
+        for c in range(256):
+            r, g, b = v.palette[c]
+            o = base + c * 4
+            out[o] = 1; out[o+1] = r; out[o+2] = g; out[o+3] = b
+    return bytes(out)
+
+
+def write_patch(resource_data, out_path):
+    """SCI1 view patch:[0x80 type][0x00 skip][resource data],命名 N.v56。"""
+    with open(out_path, 'wb') as fh:
+        fh.write(b'\x80\x00')
+        fh.write(resource_data)
+
+
+def _png_to_indices(png_path, w, h, palette):
+    from PIL import Image
+    img = Image.open(png_path).convert('RGB').resize((w, h))
+    px = img.load()
+    pal = palette or [(i, i, i) for i in range(256)]
+    # 預建 RGB→index 最近色查表(只在 palette used 色中找)
+    out = bytearray(w * h)
+    cache = {}
+    for y in range(h):
+        for x in range(w):
+            rgb = px[x, y]
+            idx = cache.get(rgb)
+            if idx is None:
+                best = 0; bd = 1 << 30
+                for i, (pr, pg, pb) in enumerate(pal):
+                    d = (pr-rgb[0])**2 + (pg-rgb[1])**2 + (pb-rgb[2])**2
+                    if d < bd:
+                        bd = d; best = i
+                cache[rgb] = idx = best
+            out[y * w + x] = idx
+    return out
+
+
+def cmd_encode(f, out_patch, replaces):
+    v = SCI1View(open(f, 'rb').read())
+    reps = {}
+    for spec in replaces:
+        ls, cs, png = spec.split(',', 2)
+        li, ci = int(ls), int(cs)
+        c = v.loops[li][ci]
+        reps[(li, ci)] = _png_to_indices(png, c.w, c.h, v.palette)
+    data = encode_uncompressed(v, reps)
+    write_patch(data, out_patch)
+    print(f"encoded → {out_patch} ({len(data)+2} bytes, {len(reps)} cel replaced)")
+
+
+def cmd_roundtrip(f):
+    orig = SCI1View(open(f, 'rb').read())
+    data = encode_uncompressed(orig)
+    re = SCI1View(b'\x80\x00' + data)
+    total = ok = 0
+    for li, cels in enumerate(orig.loops):
+        for ci, c in enumerate(cels):
+            total += 1
+            rc = re.loops[li][ci]
+            if (rc.w, rc.h) == (c.w, c.h) and bytes(rc.bitmap) == bytes(c.bitmap):
+                ok += 1
+            else:
+                print(f"  loop{li}cel{ci}: 不符")
+    print(f"roundtrip: {ok}/{total} cel bitmap identity")
+
+
 def cmd_info(f):
     v = SCI1View(open(f, 'rb').read())
     print(f"loops={v.loop_count} flags=0x{v.flags:02x} compressed={v.compressed} "
@@ -190,6 +308,10 @@ if __name__ == '__main__':
         cmd_decode(sys.argv[2], sys.argv[3])
     elif cmd == 'verify':
         cmd_verify(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif cmd == 'roundtrip':
+        cmd_roundtrip(sys.argv[2])
+    elif cmd == 'encode':
+        cmd_encode(sys.argv[2], sys.argv[3], sys.argv[4:])
     else:
         print(__doc__)
         sys.exit(1)
