@@ -41,7 +41,7 @@ done
 
 ```bash
 # 取 pinned ScummVM 2026.2.1git(git clone 後 checkout 對應 commit),放 scummvm-src/
-bash tools/apply_patches.sh scummvm-src      # 套 0001+0002+fontchinese
+bash tools/apply_patches.sh scummvm-src      # 套 0001+0002+0003+fontchinese
 docker run --rm -v "$PWD/scummvm-src:/src" -w /src qfg1-build bash -c \
   "./configure --disable-all-engines --enable-engine=sci --disable-detection-full --disable-mt32emu && make -j\$(nproc)"
 ```
@@ -56,4 +56,4 @@ bash tools/make_promo.sh                # 推廣影片(需 shots + music/bgm.wav
 ## 重建注意
 - `scummvm-src/`（~800M）、`extract/`、`out/`、遊戲 zip/rar **不入包**，皆可重建。
 - 原遊戲資源 + 衍生美術僅本機自用，勿散布、勿入公開 repo。
-- 音樂 driver 用 **pcjr**（Jones 無 AdLib/MT-32 音軌）。
+- 音樂 driver 用 **adlib**（Jones 有 AdLib(OPL2)/MT-32/PCjr 多套音軌；使用者指定 AdLib）。

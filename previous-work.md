@@ -5,16 +5,18 @@
 
 ## 現況快照（2026-07-10，主體全完成）
 
-- **M0–M4 完成**。文字 100% 繁中（776 則）；烘字美術主體（棋盤 12+ 招牌、14 按鈕、5 畫面標題、目標橫幅）重繪並實機驗證。
+- **M0–M4 + M-hires 完成**（HEAD `667cfdf`）。文字 100% 繁中（776 則）；烘字美術主體（棋盤 13 招牌、14 按鈕、5 畫面標題、目標橫幅、公平競爭/全力一搏選單）重繪並實機驗證。
 - 自寫 **SCI1 view+pic 編解碼器**（`tools/sci1_view.py` / `sci1_pic.py`）：decode 對引擎 oracle 725/752 pixel-perfect、RLE roundtrip 15/15。
-- 引擎 patch：`patches/0001`（SCI 繁中 base，沿用 qfg-1）+ `patches/0002`（Jones/SCI1 專屬：detector ZH_TWN→EN_ANY 例外、kFormat 動態字 hook、SCI_CHT_DEBUG）+ `patches/fontchinese.{h,cpp}`。
-- 打包：`out/jones-cht-{patch,data,linux}-*.tar.gz` + 推廣影片 `out/jones-cht-promo.mp4`（含原版配樂）。
+- **640×400 hi-res 中文（rule 81）**：ZH_TWN 自動切 `GFX_SCREEN_UPSCALED_640x400`。Part1＝文字 2x 直繪 display buffer（`fontchinese.cpp` drawHires + `jones_big5_hi.fnt` 32×30）；Part2＝棋盤招牌疊繪（`paint16.cpp` drawChtBoardSigns + `jones_signs.dat`，座標烘 hi-res x2）。
+- 引擎 patch：`patches/0001`（SCI 繁中 base，沿用 qfg-1）+ `patches/0002`（Jones/SCI1：detector 例外、kFormat hook、hi-res 字型、SCI_CHT_DEBUG）+ `patches/0003`（棋盤招牌疊繪）+ `patches/fontchinese.{h,cpp}`。apply 序 0001→0002→0003。
+- 打包：`out/jones-cht-{patch,data,linux}-*.tar.gz` + 推廣影片 `out/jones-cht-promo.mp4`（hi-res 截圖 + 原版 AdLib 配樂）。
 
 ## 本次做的工作（依主題）
 
 - **文字管線**：`SCI_DUMP_RES` 抽字 → `extract_strings.py`（text，保留 `\n` 跳脫）+ `extract_ega_scripts.py`（script）→ 8 批 haiku 翻譯 → `merge_translations.py` → `build_cht.py`（wqy-zenhei 15px Big5）。`supplement.tsv` 補漏抽字。`corrections.tsv` 修 `®`/日文變體。
 - **烘字**：`sci1_view.py`（view，未壓縮重建）、`sci1_pic.py`（pic 內嵌 cel，RLE 編碼）；`redraw_signs.py`/`redraw_buttons.py`/`redraw_titles.py` 批次重繪。patch `.v56`/`.p56` 放遊戲目錄。
-- **推廣影片**：`make_promo.sh`（靜態+fade、金框、Noto Sans CJK 字幕）+ `promoshots.sh`（截圖）。配樂 = 原版 **PCjr** 音樂（見下）。
+- **hi-res 中文**：`build_cht_hires.py`（烘 32×30 hi-res 字型）、`gen_signs.py`（產 jones_signs.dat 招牌座標，x2 hi-res）；引擎 `screen.cpp` 自動切 hi-res、`fontchinese.cpp` drawHires、`paint16.cpp` drawChtBoardSigns。
+- **推廣影片**：`make_promo.sh`（靜態+fade、金框、Noto Sans CJK 字幕）+ `promoshots.sh`/`promoshots2.sh`/`promoshots3.sh`（hi-res 截圖）。配樂 = 原版 **AdLib(OPL2)** 音樂（見下）。
 
 ## 工具鏈 / harness（全 docker）
 
@@ -26,11 +28,12 @@
 - 中文化**僅放 ScummVM patch**；原遊戲資源/衍生美術**不入庫**（`.gitignore` 排除 `game/`、`extract/`、`scummvm-src/`）。
 - 啟用中文：target config 存 `language=tw`（**不要**命令列 `--language=tw`，會讓 SCI identify 失敗）。
 - 抽字/翻譯 key 硬換行必 `\n` 跳脫；`%d`/`%2d`/`$` 格式符原樣保留。
-- **配樂[HARD]用原版**：Jones 音樂是 **PCjr/Tandy track**（**無 AdLib/MT-32**）→ `music_driver=pcjr` 才有聲；`--disable-mt32emu`（此 checkout munt 缺 config.h 無法編，且 Jones 用不到）。
+- **配樂[HARD]用原版**：Jones **同時有** AdLib(OPL2, `patch.003`)、MT-32(`patch.001`) 與 PCjr/Tandy track。使用者指定用 **AdLib** → `music_driver=adlib`（經典 Sierra OPL2 音色，棋盤畫面播放）。`--disable-mt32emu`（此 checkout munt 缺 config.h 無法編，AdLib 已足夠）。⚠ 舊版 previous-work 曾誤記「只有 PCjr、無 AdLib」，已更正。
 
 ## 待辦 / 開放項目
 
-- 零星未做烘字：挑戰畫面 `play fair?`/`go for broke?` 按鈕、開場 credits 人名、標題 logo `pic_0`。
+- **JONES GOALS 畫面**：頂部橫幅 `JONES GOALS` 仍英文烘圖 + `Goal Points = %d` 動態字 EN（StrCat 組字，kFormat 未攔到）。需另做一輪 RE 定位該 view/cel 再重繪（見 WORKLIST「M-hires 已知長尾」）。
+- 零星未做烘字：開場 credits 人名、標題 logo `pic_0`。（`play fair?`/`go for broke?` 按鈕已中文化＝公平競爭/全力一搏。）
 - 多平台打包（Win/Mac/Android）：可比照 qog-2 的 CI/cross-compile；目前只做 Linux。
 - M2 長尾：`Goal Points = N` 這類 StrCat 組字仍可能 MISS（可用 `SCI_CHT_DEBUG` MISS-collection 收尾）。
 
