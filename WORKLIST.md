@@ -10,7 +10,7 @@ repo：`github.com/wicanr2/jones_in_the_fast_lane`。工作目錄 `~/scummvm/jon
 | M0 可行性 + 骨架 | ✅ 偵測/dump/抽字打通，術語表建於 `docs/10-terminology.md` |
 | **M1 端到端 spike** | ✅ **版權畫面繁中渲染實機驗證**（`docs/images/m1-spike-copyright-cht.png`，CHT-HIT） |
 | **M2 全文字中文化** | ✅ **776 則翻譯**(773 靜態+3 supplement)；商店/大學對白+動態「第N週」實機驗證；長尾見下 |
-| M3 烘字 UI（view/pic） | 🔲 未開始（風險：sci_view.py 寫死 SCI1.1，Jones 為 SCI1） |
+| **M3 烘字 UI（view/pic）** | 🔨 進行中：SCI1 view **decoder 完成+驗證(725/752 pixel-perfect)**；encoder/重繪/pic 待做（`docs/40-baked-art.md`） |
 | M4 多平台打包 + README | 🔲 未開始 |
 
 ## 引擎改動（相對 qfg-1 base，Jones 專屬）
