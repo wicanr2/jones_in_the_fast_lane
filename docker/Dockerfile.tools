@@ -1,0 +1,4 @@
+# Python 字型/資源工具鏈(Pillow 烘 Big5 點陣字)
+FROM python:3.12-slim
+RUN pip install --no-cache-dir Pillow
+WORKDIR /w
