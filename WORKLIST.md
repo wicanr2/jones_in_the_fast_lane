@@ -108,4 +108,4 @@ SCI_CHT_DEBUG=1 ./scummvm jones   # 印 CHT-HIT/MISS
 - 定位：pic.000 只有 1 個內嵌 cel（cel0，193×165，含 Sierra 球標 + SIERRA PRESENTS + JONES 標題框）。
 - 設計：派 3 個設計師 subagent 並行出稿（忠實 3D 還原 / 現代黑體 / 明體古典戲單），使用者選 **明體古典**（金色粗明體 + 深藍戲單框，呼應「劇場」，保留 Sierra 球標與英文副標致敬）。`tools/redraw_title.py` 自足重跑（由 pic.000 取調色盤與參考 cel → 產 mockup → 呼叫 `sci1_pic.py replace` → `0.p56`）。
 - 交付：`dist/game-cht/0.p56`；實機驗證標題畫面金字清晰。
-- **credits**：Jones 在 ScummVM 流程中**無獨立 credits/人名畫面**（版權頁的「設計師、美術、程式設計師、音樂家」致謝已翻譯）。剩餘僅標題 logo pic_0 已完成。畫面文字/美術中文化至此收尾。
+- **credits（更正）**：先前誤判「無獨立 credits 畫面」。實測(AppImage 測試時)發現**標題後會自動播一段 credits 動畫序列**——封面美術 + 角色頭銜與人名（Executive Producer Ken Williams…）。人名屬專有名詞(維持原文),但頭銜 label(Executive Producer / Designed by…)仍為英文烘字，屬**未完成長尾**(需定位該序列的 view/text 再處理)。標題 logo pic_0 已完成。

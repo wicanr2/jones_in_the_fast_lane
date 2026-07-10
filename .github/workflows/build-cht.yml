@@ -1,0 +1,133 @@
+name: build-cht-multiplatform
+
+# 三平台建置人生劇場 CHT ScummVM(SCI-only,套 patch 0001-0004 + fontchinese)。
+# 手動觸發或打 tag(v*)時跑。macOS 用 native runner(Linux 無法跨編 macOS);
+# Windows 走 MSYS2/MinGW;Linux 產 AppImage。各 job 把 CHT 資料(dist/game-cht)一起打包。
+#
+# ⚠ ScummVM 基準版本:預設 clone 上游 master。patch 以 --fuzz=3 容錯套用;
+#   若上游漂移導致套用失敗,把下方 SCUMMVM_REF 釘到 patch 當時的 commit/tag。
+
+on:
+  workflow_dispatch:
+    inputs:
+      scummvm_ref:
+        description: "ScummVM git ref (branch/tag/commit)"
+        default: "master"
+  push:
+    tags: ["v*"]
+
+env:
+  SCUMMVM_REPO: https://github.com/scummvm/scummvm.git
+  SCUMMVM_REF: master
+
+jobs:
+  # ── macOS(.app + .dmg,native runner)──────────────────────────────
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: |
+          brew install sdl2 flac freetype fribidi jpeg-turbo libmad libpng libvorbis mpeg2dec zlib dylibbundler create-dmg || true
+      - name: Clone ScummVM
+        run: git clone --depth 1 --branch "${{ github.event.inputs.scummvm_ref || env.SCUMMVM_REF }}" "$SCUMMVM_REPO" scummvm-src
+      - name: Apply CHT patches
+        run: bash tools/apply_patches.sh scummvm-src
+      - name: Configure + build + bundle
+        working-directory: scummvm-src
+        run: |
+          ./configure --disable-all-engines --enable-engine=sci --disable-mt32emu --enable-release
+          make -j3
+          # ScummVM 的 macOS bundle target 產 ScummVM.app
+          make bundle || make bundle-pack || true
+      - name: Assemble .app (bundle dylibs) + CHT data + dmg
+        run: |
+          set -e
+          APP=$(find scummvm-src -maxdepth 2 -iname 'ScummVM.app' | head -1)
+          [ -z "$APP" ] && { echo "no .app produced"; ls -R scummvm-src | grep -i '\.app' || true; exit 1; }
+          rm -rf stage; mkdir -p stage
+          cp -R "$APP" "stage/人生劇場-CHT.app"
+          APPDIR="stage/人生劇場-CHT.app"
+          # 把非系統 dylib(brew 的 SDL2 等)收進 .app,改寫 rpath → 可攜
+          BIN="$APPDIR/Contents/MacOS/scummvm"
+          [ -f "$BIN" ] && dylibbundler -od -b -x "$BIN" -d "$APPDIR/Contents/libs" -p @executable_path/../libs || true
+          # CHT 資料放進 .app;也在 dmg 根放一份 + 安裝說明
+          mkdir -p "$APPDIR/Contents/Resources/cht"
+          cp dist/game-cht/* "$APPDIR/Contents/Resources/cht/"
+          cp -R dist/game-cht stage/cht
+          cp dist/game-cht/安裝說明.txt stage/ || true
+          hdiutil create -volname "人生劇場 CHT" -srcfolder stage -ov -format UDZO 人生劇場-CHT-macOS.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 人生劇場-CHT-macOS
+          path: 人生劇場-CHT-macOS.dmg
+
+  # ── Windows(MinGW via MSYS2)────────────────────────────────────────
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: "msys2 {0}"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            git make pkg-config
+            mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-zlib mingw-w64-x86_64-libpng mingw-w64-x86_64-freetype
+      - name: Clone ScummVM + patch
+        run: |
+          cd repo
+          git clone --depth 1 --branch "$SCUMMVM_REF" "$SCUMMVM_REPO" scummvm-src
+          bash tools/apply_patches.sh scummvm-src
+      - name: Build
+        run: |
+          cd repo/scummvm-src
+          ./configure --host=x86_64-w64-mingw32 --disable-all-engines --enable-engine=sci --disable-mt32emu --enable-release
+          make -j4
+      - name: Package
+        run: |
+          cd repo
+          mkdir -p dist-win/cht
+          cp scummvm-src/scummvm.exe dist-win/
+          cp dist/game-cht/* dist-win/cht/
+          # 打包 SDL2.dll 等 runtime
+          ldd scummvm-src/scummvm.exe | grep mingw64 | awk '{print $3}' | xargs -I{} cp {} dist-win/ || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 人生劇場-CHT-Windows
+          path: repo/dist-win
+
+  # ── Linux AppImage ──────────────────────────────────────────────────
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libsdl2-dev zlib1g-dev libpng-dev \
+            libfreetype6-dev libmpeg2-4-dev libvorbis-dev libflac-dev wget file
+      - name: Clone ScummVM + patch + build
+        run: |
+          git clone --depth 1 --branch "$SCUMMVM_REF" "$SCUMMVM_REPO" scummvm-src
+          bash tools/apply_patches.sh scummvm-src
+          cd scummvm-src
+          ./configure --disable-all-engines --enable-engine=sci --disable-mt32emu --enable-release
+          make -j4
+      - name: Build AppImage
+        run: |
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -O /tmp/linuxdeploy
+          wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O /tmp/appimagetool
+          chmod +x /tmp/linuxdeploy /tmp/appimagetool
+          export APPIMAGE_EXTRACT_AND_RUN=1
+          # 同一支 build_appimage.sh:W 指到 repo 根、工具路徑用 env 覆寫
+          W="$PWD" LINUXDEPLOY=/tmp/linuxdeploy APPIMAGETOOL=/tmp/appimagetool bash tools/build_appimage.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 人生劇場-CHT-Linux-AppImage
+          path: out/*.AppImage

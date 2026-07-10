@@ -40,13 +40,24 @@ Sierra 1990 年經典**現代都市生活模擬**遊戲的**繁體中文化**專
 > 職業介紹所找工作 → 上班賺錢 → 大學進修解鎖高薪工作 → 銀行存款/投資/貸款 → 商店消費換快樂 →
 > 缺錢時當舖典當或買樂透碰運氣。
 
-## 安裝使用
+## 下載（各平台，皆內含 CHT 引擎與資料；只需另備原版遊戲檔）
+
+| 平台 | 檔案 | 說明 |
+|---|---|---|
+| **Linux** | `人生劇場-CHT-x86_64.AppImage` | 自足 AppImage，`chmod +x` 後直接執行。把遊戲目錄當參數傳給它會自動裝繁中資料並以中文啟動。 |
+| **Windows** | `jones-cht-windows.zip` | MXE 靜態單一 `scummvm.exe`（免 DLL）＋ `繁中啟動.bat`。 |
+| **macOS** | `人生劇場-CHT-macOS.dmg` | 由 GitHub Actions（macOS runner）建置——見 `.github/workflows/build-cht.yml`，打 tag `v*` 或手動觸發後於 Actions 產物下載。 |
+
+> 三個平台的 binary 都是**套過 CHT 引擎 patch 的 ScummVM**（官方版沒有繁中繪字路徑）。原遊戲檔請自備，不隨附（版權）。
+
+## 安裝使用（手動套用到既有繁中 ScummVM）
 
 1. 準備 Jones in the Fast Lane（DOS/English）原版遊戲檔（`resource.map`/`resource.001`/`resource.002`…）。
-2. 取得支援繁中的 ScummVM（見「建置」）。
+2. 取得支援繁中的 ScummVM（用上方各平台包，或見「建置」自行編）。
 3. 把 `dist/game-cht/` 內全部檔案複製到遊戲目錄：
    - `translation.tsv`、`jones_big5.fnt`（文字＋低解字型）
    - `jones_big5_hi.fnt`、`jones_signs.dat`（640×400 hi-res 字型＋棋盤招牌疊繪資料）
+   - `0.p56`（標題 logo「人生劇場」）
    - `10.v56`、`11.p56`、`250.v56`、`500/501/505/506.v56`（棋盤招牌／按鈕／橫幅烘字 patch）
 4. 在 ScummVM 加入遊戲，將該 target 設定：語言＝**Chinese (Traditional)**（`language=tw`）啟用中文；
    音樂驅動＝**AdLib**（`music_driver=adlib`）。★ Jones 內建 AdLib(OPL2)+MT-32 樂器庫,配樂在棋盤畫面播放(經典 Sierra OPL2 音色)。
@@ -54,11 +65,23 @@ Sierra 1990 年經典**現代都市生活模擬**遊戲的**繁體中文化**專
 ## 建置（Docker，SCI-only）
 
 ```bash
-bash tools/apply_patches.sh <scummvm-src>   # 套引擎繪字 patch(0001+0002+0003+fontchinese)
+bash tools/apply_patches.sh <scummvm-src>   # 套引擎繪字 patch(0001+0002+0003+0004+fontchinese)
 docker run --rm -v "$PWD/scummvm-src:/src" -w /src jones-build bash -c \
   "./configure --disable-all-engines --enable-engine=sci --disable-mt32emu && make -j$(nproc)"
 ```
 ScummVM 基準版本：`2026.2.1git`。
+
+**各平台打包**（Dockerfile 在 `docker/`，腳本在 `tools/`）：
+
+```bash
+# Linux AppImage
+docker build -t jones-appimage -f docker/Dockerfile.appimage docker/
+docker run --rm --privileged -v "$PWD:/w" jones-appimage bash /w/tools/build_appimage.sh
+# Windows(MXE 靜態 mingw)
+docker build -t jones-mxe -f docker/Dockerfile.mxe docker/
+docker run --rm -v "$PWD:/w" jones-mxe bash /w/tools/build_windows.sh
+# macOS：GitHub Actions（.github/workflows/build-cht.yml，macos runner 產 .app/.dmg）
+```
 
 ## 文件索引
 

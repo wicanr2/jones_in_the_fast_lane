@@ -24,24 +24,28 @@ cp -a claude-session/projects/-home-anr2-scummvm-janes-in-fast-lane ~/.claude/pr
 
 | image | Dockerfile | 用途 |
 |---|---|---|
-| `qfg1-build` | `docker/Dockerfile.build` | build ScummVM SCI |
+| `qfg1-build` | `docker/Dockerfile.build` | build ScummVM SCI(Linux)|
 | `qfg1-capture` | `docker/Dockerfile.capture` | xvfb 截圖/導航 |
 | `jones-tools` | `docker/Dockerfile.tools` | Pillow 烘字 |
 | `jones-video` | `docker/Dockerfile.video` | ffmpeg/IM 影片 |
 | `jones-audio` | `docker/Dockerfile.audio` | +pulseaudio 錄配樂 |
+| `jones-appimage` | `docker/Dockerfile.appimage` | Linux AppImage 打包 |
+| `jones-mxe` | `docker/Dockerfile.mxe` | Windows 靜態跨編(MXE mingw,~2GB)|
 
 ```bash
 for f in build capture tools video audio; do
   tag=$([ $f = build -o $f = capture ] && echo qfg1-$f || echo jones-$f)
   docker build -t $tag -f docker/Dockerfile.$f docker/
 done
+docker build -t jones-appimage -f docker/Dockerfile.appimage docker/
+docker build -t jones-mxe -f docker/Dockerfile.mxe docker/   # 下載較久
 ```
 
 ## 3. 重建 ScummVM 引擎（scummvm-src 不入包）
 
 ```bash
 # 取 pinned ScummVM 2026.2.1git(git clone 後 checkout 對應 commit),放 scummvm-src/
-bash tools/apply_patches.sh scummvm-src      # 套 0001+0002+0003+fontchinese
+bash tools/apply_patches.sh scummvm-src      # 套 0001+0002+0003+0004+fontchinese
 docker run --rm -v "$PWD/scummvm-src:/src" -w /src qfg1-build bash -c \
   "./configure --disable-all-engines --enable-engine=sci --disable-detection-full --disable-mt32emu && make -j\$(nproc)"
 ```
@@ -51,6 +55,10 @@ docker run --rm -v "$PWD/scummvm-src:/src" -w /src qfg1-build bash -c \
 ```bash
 bash tools/package.sh $(date +%Y%m%d)   # patch源碼包 / 遊戲資料包 / Linux執行包
 bash tools/make_promo.sh                # 推廣影片(需 shots + music/bgm.wav)
+# 多平台 binary 包:
+docker run --rm --privileged -v "$PWD:/w" jones-appimage bash /w/tools/build_appimage.sh  # → out/*.AppImage
+docker run --rm -v "$PWD:/w" jones-mxe bash /w/tools/build_windows.sh                      # → out/jones-cht-windows.zip
+# macOS:push tag v* 或手動觸發 .github/workflows/build-cht.yml(macos runner 產 .app/.dmg)
 ```
 
 ## 重建注意
