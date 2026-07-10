@@ -112,3 +112,13 @@ SCI_CHT_DEBUG=1 ./scummvm jones   # 印 CHT-HIT/MISS
 
 ## 畫面中文化收尾（2026-07-10）
 文字(776 則)+ 全烘字美術(標題 logo、棋盤 13 招牌、14 按鈕、5 畫面標題、目標橫幅+動態字、選單、**開場 credits 頭銜**)。畫面上剩英文僅:人名(專有名詞,credits)、Sierra 球標(品牌)。
+
+## M-buttons:按鈕清晰化 + text.700 標籤（2026-07-11）
+使用者回報「按鈕有點糊」。根因:**view.250 = 14 個動作按鈕(32×9 logical)**,烘字在 9px 被引擎 2x nearest 放大 → 塊狀(rule 81)。
+- **patch 0005(view.cpp hi-res 按鈕疊繪)**:`GfxView::draw` 對 view 250 在 ZH_TWN+hi-res,用面色蓋掉烘字、以**原生 16px 字型(`jones_btn.fnt`)**在 display buffer 直繪清晰中文(`jones_buttons.dat` 存 loop→面色/字色/中文碼)。**★定位用 `clipRectTranslated`(螢幕絕對 logical),`rect` 是 port 相對會偏**。`tools/gen_buttons.py` 產資料+字型。實機驗證「完成/？」清晰。
+- **text.700 87 標籤**:食物/課程/家電/服飾/職稱/投資/店名(Trade School=技職學校、Professor=教授…)先前未出貨(translation_full 有值但舊 build 沒收 + 35 條未翻)。subagent 翻譯對齊術語表,重建 runtime+字型。繪製文字→hi-res 字型自動清晰。
+
+## 多平台完整包(2026-07-11)
+三平台各出**可玩版(含遊戲檔,雙擊即玩,私人)** + **發佈版(不含遊戲)**:
+- Linux AppImage(`build_appimage.sh` / `build_appimage_play.sh`)、Windows(MXE 靜態,`build_windows.sh` + 可攜 ini/bat)、macOS(GitHub Actions arm64,`.github/workflows/build-mac.yml`;可玩版 `build_mac_play.sh` 注入遊戲+`.command`,不動簽名)。全在 `dist-all`(不入 repo)。
+- macOS 關鍵(mac-app-cross-pack 方法論):**源碼編真 SDL2 2.30.9**(非 brew sdl2-compat shim)、ScummVM configure flags 當環境前綴、動態 make + bundle-pack(scummvm-static 冒名)+ docktileplugin stub、codesign 當最後一步、dylibbundler。
