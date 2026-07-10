@@ -70,6 +70,8 @@ jobs:
           make -j$(sysctl -n hw.ncpu) scummvm >/tmp/sv_make.log 2>&1 || { tail -50 /tmp/sv_make.log; exit 1; }
           # bundle-pack target 內部有 `cp scummvm-static ...`;用動態 binary 冒名滿足它,避開靜態連結
           cp scummvm scummvm-static
+          # bundle-pack 還會 cp scummvm.docktileplugin(dock 圖示外掛);建它,建不起來就放 stub 讓 cp 過
+          make scummvm.docktileplugin >>/tmp/sv_make.log 2>&1 || { echo "docktile 略過→stub"; mkdir -p scummvm.docktileplugin/Contents/MacOS; }
           echo "$(date +%H:%M:%S) make bundle-pack(建 .app:Info.plist/icon/themes/enginedata + 塞 binary)"
           make bundle-pack >/tmp/sv_bundle.log 2>&1 || { tail -40 /tmp/sv_bundle.log; exit 1; }
           echo "$(date +%H:%M:%S) bundle-pack done"; ls -la ScummVM.app/Contents/MacOS/
