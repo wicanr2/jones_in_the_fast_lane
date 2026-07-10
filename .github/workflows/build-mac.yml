@@ -96,11 +96,14 @@ jobs:
           # 斷言:SDL2 有被打包 + 是真 SDL2(非 shim)
           test -f "$A/Contents/Frameworks/libSDL2-2.0.0.dylib" || { echo "ERROR: SDL2 未被打包(玩家端會黑畫面)"; exit 1; }
           otool -L "$A/Contents/Frameworks/libSDL2-2.0.0.dylib" | grep -qi SDL3 && { echo "ERROR: shim"; exit 1; } || true
-          # dylibbundler 改過 install_name → 必須 ad-hoc 重簽整個 .app,否則 Gatekeeper/載入失敗
-          echo "$(date +%H:%M:%S) codesign ad-hoc"
-          codesign --force --deep -s - "$A" || true
-          # CHT 資料
+          # CHT 資料放進 .app(要在 codesign 之前,才會被 seal)
           mkdir -p "$A/Contents/Resources/cht"; cp dist/game-cht/* "$A/Contents/Resources/cht/"
+          # ★ codesign 必須是「最後一個動 .app 的步驟」:dylibbundler 改 install_name + 加 Resources
+          #   之後才簽,才能 seal 全部;先簽再改 = 簽名失效 → Gatekeeper/arm64 拒跑。
+          echo "$(date +%H:%M:%S) codesign ad-hoc(最後一步)"
+          codesign --force --deep -s - "$A" || true
+          codesign --verify --deep --strict "$A" && echo "codesign verify OK" || echo "WARN: codesign verify 失敗"
+          # 發佈版方便:cht 也放 dmg 根(不動 .app)
           cp -R dist/game-cht stage/cht
           cp dist/game-cht/安裝說明.txt stage/ 2>/dev/null || true
           echo "$(date +%H:%M:%S) package dmg + tar.gz(雙保險,繞 APFS)"
