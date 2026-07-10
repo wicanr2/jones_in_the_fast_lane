@@ -1,0 +1,95 @@
+Refrigerator.....	冰箱.....
+Stove|..............||	爐子|..............||
+Stereo|.............||	立體音響|.............||
+Color TV..........||	彩色電視..........||
+Black & White TV||	黑白電視||
+Microwave|.........|	微波爐|.........|
+Casual Clothes...	便服...
+Dress Clothes.....	正式服裝.....
+Baseball Tickets..	棒球票..
+Theatre Tickets...	劇院票...
+Concert Tickets|..|	演唱會票|..|
+Encyclopedia.....	百科全書.....
+Dictionary..........	字典..........
+Atlas.................|	地圖冊.................|
+Dog Food...........|	狗糧...........|
+8-Track Player...	八軌播放機...
+Works of Capote|	卡波特作品|
+Pawnable Items	可典當物品
+Take It	拿走
+Leave It	留下
+Buyable Items	可購買物品
+Redeemable Items	可兌換物品
+Discount Store Jobs Available:	折扣超市工作機會：
+Clerk              |||	店員              |||
+Assistant Manager  	副經理
+Manager           |	經理           |
+Monolith's Jobs Available:	大石頭漢堡店工作機會：
+Cook               ||	廚師               ||
+Clerk               |	店員               |
+Assistant Manager  |||	副經理  |||
+Manager           ||||	經理           ||||
+QT Clothing Jobs Available:	Q.T 服飾店工作機會：
+Salesperson        ||	店員        ||
+Socket City Jobs Available:	多插座城市電器行工作機會：
+Salesperson         ||	店員         ||
+Electronic's Repair   	電子產品維修
+Manager            |	經理            |
+University Jobs Available:	高等技術大學工作機會：
+Janitor            |	工友            |
+Factory Jobs Available:	工廠工作機會：
+Janitor            |||	工友            |||
+Assembly Worker    ||||	組裝工人    ||||
+Secretary          ||	秘書          ||
+Machinist's Helper   |	機械師助手   |
+Executive Secretary ||	行政秘書 ||
+Department Manager 	部門經理
+General Manager    ||	總經理    ||
+Bank Jobs Available:	銀行工作機會：
+Teller              ||	出納員              ||
+Investment Broker  |||	投資營業員  |||
+Black's Market Jobs Available:	布萊克超市工作機會：
+Checker            |	收銀員            |
+Butcher           ||||	肉舖           ||||
+Rent Office Jobs Available:	租屋中心工作機會：
+Groundskeeper      ||||	保全員      ||||
+Apartment Manager  	公寓經理
+Happiness is accumulated by acquiring goods, achieving goals, taking time off from work, and helping little old ladies cross the street so that they don't get hit by any speeding marbles.	快樂透過購置商品、達成目標、遠離工作，以及幫助老婦人過馬路以免被飛過的彈珠擊中而累積。
+Education is accumulated by attending the university and graduating from the classes offered. A computer and some reference books can be very beneficial to your studies.	學歷透過入學高等技術大學、修習課程而累積。電腦和參考書對學業幫助甚大。
+Career is achieved by working hard, climbing the corporate ladder, improving your skills, dependability, and advancing your education. Remember, hire a kid, they have all the answers.	職業成就來自努力工作、晉升企業階梯、提升技能與可靠性，以及精進學歷。記住，聘僱小孩吧，他們什麼都懂。
+Goal Points = 	目標分數 =
+Dialog	對話
+Controls	控制
+Normal	正常
+Cancel	取消
+Gauge	量表
+Sound	音效
+Change Directory	更改目錄
+Cycle	循環
+Motion	動作
+gamefile.sh	gamefile.sh
+controls	控制
+Enter input	輸入
+Turn Messages On	開啟訊息
+ Options 	 選項
+ Status 	 狀態
+Change reading speed.	更改閱讀速度。
+Reading Speed	閱讀速度
+More Time	更多時間
+Less Time	更少時間
+Change animation speed.	更改動畫速度。
+Game Speed	遊戲速度
+Faster	更快
+Slower	更慢
+Change sound volume.	更改音量。
+Sound Volume	音量
+Louder	更大聲
+Softer	更小聲
+Change graphics detail level.	更改圖形細節等級。
+Graphic Detail	圖形細節
+More Detail	更多細節
+Less Detail	更少細節
+Feature	功能
+Collect	收集
+Script	劇本
+Event	事件

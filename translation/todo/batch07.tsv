@@ -1,0 +1,97 @@
+Blue Chip Stocks	
+Penny Stocks	
+Low Cost Apartment	
+Rent Office	
+Security Apartment	
+Black's Market	
+Bank	
+Factory	
+Employment Office	
+University	
+Socket City	
+QT Clothing	
+Monolith	
+Z-Mart	
+Pawn Shoppe	
+The software you are now using was produced\nthrough the efforts of many people:\ndesigners, artists, programmers, musicians,\nand many other hard-working professionals.\n\nIf you make copies of this software for any\nreason other than to make a personal backup,\nyou are not only breaking the law, but raising\nthe cost of software for all legitimate users.\n\nPLEASE\nDO NOT MAKE ILLEGAL COPIES OF THIS GAME !	
+The disk is full. You must use another disk. Save Aborted.	
+The game has been saved.	
+The saved game was saved under a different interpreter. It cannot be restored.	
+Can't Restore. No previously saved game was found.	
+New save-game directory:	
+%s\nis not a valid directory	
+Please insert your %s disk in drive %s.	
+File: %s	
+JONES IN THE FAST LANE\nAdditional Programmers:\nSol Ackerman,\nDavid Slayback\n\nAdditional Artists:\nMike Milo,\nDave Willardson,\nCalvin Patton,\n\nVersion %s	
+JONES IN THE FAST LANE\nDevelopment System:\nJeff Stephenson, Robert Heitman,\nPablo Ghenis, John Hartin,\nDan Foy, Larry Scott,\nMark Hood, John Rettig\nCorey Cole, Eric Hart.\n\nSound Effects: Ken Allen\n\nDialogue: Josh Mandel\nSol Ackerman, Warren Schwader	
+      JONES IN THE FAST LANE\nF1 - Help - This screen\nF2 - Music on/off \nF3 - Sound Effects on/off \nF4 - Current Player's Statistics \nF5 - Saves the current game\nF6 - View Goals Screens\nF7 - Restores the saved game\nF8 - Non-essential messages on/off\nF9 - Restarts the game\nF10- About Jones	
+     JONES IN THE FAST LANE\nCtrl-Q - Quit\nCtrl-R - Change Reading Speed\nCtrl-S - Change Speed\nCtrl-T - Set Graphics Detail Level\nCtrl-V - Change Volume\nCtrl-Y - Set Save Directory\nCtrl-Z - Delete a Player\nEsc   - Menu Bar/Pauses Game\nLeft Mouse - Select\nMiddle Mouse/CTRL-Left - Goals\nRight Mouse/SHIFT-Left - Statistics	
+Restarting?	
+Quitting?	
+Saving a game will overwrite a previously saved game.\nContinue?	
+Restore a saved game?	
+Non-essential\nmessages ON.	
+Non-essential\nmessages OFF.	
+Delete this player?	
+Another Statistics Screen is not allowed.	
+Another Goals Screen is not allowed.	
+%s\n[Collection of size %d]	
+%s\n[List of size %d]	
+%s\n[Set of size %d]	
+Turn Music Off	
+Turn Music On	
+Turn Sound Effects Off	
+Turn Sound Effects On	
+Place	
+Player	
+Restart	
+Quit	
+Player 1	
+Player 2	
+Player 3	
+Player 4	
+Talker	
+Goods	
+Consumable	
+Durable	
+Educational	
+Consumables	
+Durables	
+Education	
+Continue	
+Pay rent for 1 month.  	
+Ask For More Time.       	
+Rent Low-Cost Apartment  	
+Rent Security Apartment  	
+Pay Garnishment Balance  	
+Food For 1 Week....	
+Food For 2 Weeks..|	
+Food For 4 Weeks..	
+10 Lottery Tickets|...|	
+Newspaper................|	
+Deposit  	
+Withdraw  	
+Loan Payment	
+Apply For Loan	
+See The Broker	
+Z-Mart Discount	
+Monolith Burgers	
+Socket City Appliance	
+Hi-Tech University	
+Enrollment Fee 	
+Refrigerator|.......	
+Freezer|..............|	
+Stove.................|	
+Color TV.............	
+Stereo................|	
+Microwave..........|	
+Hot Tub..............	
+Computer............	
+Business Suit  |	
+Dress Clothes  |	
+Hamburgers.........	
+Cheeseburger.......|	
+Astro Chicken.......|	
+Fries....................	
+Shakes.................|	
+Colas...................|	

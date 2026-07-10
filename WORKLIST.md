@@ -9,7 +9,7 @@ repo：`github.com/wicanr2/jones_in_the_fast_lane`。工作目錄 `~/scummvm/jon
 |---|---|
 | M0 可行性 + 骨架 | ✅ 偵測/dump/抽字打通，術語表建於 `docs/10-terminology.md` |
 | **M1 端到端 spike** | ✅ **版權畫面繁中渲染實機驗證**（`docs/images/m1-spike-copyright-cht.png`，CHT-HIT） |
-| M2 全文字中文化 | 🔲 text 622 則已抽；script 內嵌字串待補抽；翻譯待做 |
+| **M2 全文字中文化** | ✅ **776 則翻譯**(773 靜態+3 supplement)；商店/大學對白+動態「第N週」實機驗證；長尾見下 |
 | M3 烘字 UI（view/pic） | 🔲 未開始（風險：sci_view.py 寫死 SCI1.1，Jones 為 SCI1） |
 | M4 多平台打包 + README | 🔲 未開始 |
 
@@ -74,3 +74,16 @@ SCI_CHT_DEBUG=1 ./scummvm jones   # 印 CHT-HIT/MISS
 
 ## 記憶
 `~/.claude/projects/-home-anr2-scummvm-janes-in-fast-lane/memory/`（架構 + 踩雷）。
+
+## M2 補充(2026-07-10 完成主體)
+
+- **語料 774 則**：text 622 + script 152（`extract_ega_scripts.py` 抽），8 批 haiku 翻譯，`merge_translations.py` 100% 命中。
+- **烘字**：`build_cht.py` 用 **wqy-zenhei 15px**，1305 字；`translation/corrections.tsv` 修 `®`→`(R)`、日文變體 `薫`→`燻`。
+- **build 輸入改用 `translation/translation_full.tsv`**（= `translation.tsv` canonical + `supplement.tsv`）。
+- **動態字**：新增 `engines/sci/engine/kstring.cpp` 的 **kFormat hook**——ZH_TWN 時先翻譯 format 模板（含 %d）再代入，解掉「Week #%2d→第 %2d 週→第 1 週」等。
+- **supplement**：`extract_ega_scripts.py` 啟發式漏抽的（前導空格/`\n\n`）challenge 對白，直接補精確 key 於 `translation/supplement.tsv`。
+
+### M2 已知長尾（M3 playtest 時用 MISS-collection 收尾）
+- `Goal Points = 200 !` 這類 **StrCat 組字**（靜態前綴+數字連接後才繪）仍可能 MISS——已補 `Goal Points = ` 前綴，待實測。
+- 純格式片段 `%d!`/`%s!`（無可譯文字，產出數字，無需翻）。
+- **完整性 gate**：跑一輪各畫面 `SCI_CHT_DEBUG=1` 收集所有含文字的 CHT-MISS，補進 supplement。此為 M2 最終驗收，安排在 M3 實機 playtest 一併做。

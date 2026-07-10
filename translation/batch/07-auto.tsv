@@ -1,0 +1,97 @@
+Blue Chip Stocks	優質股票
+Penny Stocks	便宜股票
+Low Cost Apartment	低價公寓
+Rent Office	租屋中心
+Security Apartment	保安公寓
+Black's Market	布萊克超市
+Bank	銀行
+Factory	工廠
+Employment Office	職業介紹所
+University	高等技術大學
+Socket City	多插座城市電器行
+QT Clothing	Q.T 服飾店
+Monolith	大石頭漢堡店
+Z-Mart	Z-超商
+Pawn Shoppe	當舖
+The software you are now using was produced\nthrough the efforts of many people:\ndesigners, artists, programmers, musicians,\nand many other hard-working professionals.\n\nIf you make copies of this software for any\nreason other than to make a personal backup,\nyou are not only breaking the law, but raising\nthe cost of software for all legitimate users.\n\nPLEASE\nDO NOT MAKE ILLEGAL COPIES OF THIS GAME !	您現在使用的軟體是由許多\n人共同努力製作的：\n設計師、美術、程式設計師、\n音樂家及許多其他勤奮的\n專業人士。\n\n若您複製此軟體的目的\n不是製作個人備份，\n您不僅違反法律，\n也提高了所有合法使用者的\n軟體成本。\n\n請勿製作\n本遊戲的非法複製！
+The disk is full. You must use another disk. Save Aborted.	磁碟已滿。請使用其他磁碟。\n儲存已中止。
+The game has been saved.	遊戲已儲存。
+The saved game was saved under a different interpreter. It cannot be restored.	此存檔是在不同版本下儲存，\n無法還原。
+Can't Restore. No previously saved game was found.	無法還原。找不到之前的\n存檔。
+New save-game directory:	新的存檔目錄：
+%s\nis not a valid directory	%s\n不是有效的目錄
+Please insert your %s disk in drive %s.	請將您的 %s 磁片插入\n磁碟機 %s。
+File: %s	檔案：%s
+JONES IN THE FAST LANE\nAdditional Programmers:\nSol Ackerman,\nDavid Slayback\n\nAdditional Artists:\nMike Milo,\nDave Willardson,\nCalvin Patton,\n\nVersion %s	人生劇場\n額外程式設計師：\nSol Ackerman,\nDavid Slayback\n\n額外美術設計：\nMike Milo,\nDave Willardson,\nCalvin Patton,\n\n版本 %s
+JONES IN THE FAST LANE\nDevelopment System:\nJeff Stephenson, Robert Heitman,\nPablo Ghenis, John Hartin,\nDan Foy, Larry Scott,\nMark Hood, John Rettig\nCorey Cole, Eric Hart.\n\nSound Effects: Ken Allen\n\nDialogue: Josh Mandel\nSol Ackerman, Warren Schwader	人生劇場\n開發團隊：\nJeff Stephenson, Robert Heitman,\nPablo Ghenis, John Hartin,\nDan Foy, Larry Scott,\nMark Hood, John Rettig\nCorey Cole, Eric Hart.\n\n音效設計：Ken Allen\n\n對白：Josh Mandel\nSol Ackerman, Warren Schwader
+      JONES IN THE FAST LANE\nF1 - Help - This screen\nF2 - Music on/off \nF3 - Sound Effects on/off \nF4 - Current Player's Statistics \nF5 - Saves the current game\nF6 - View Goals Screens\nF7 - Restores the saved game\nF8 - Non-essential messages on/off\nF9 - Restarts the game\nF10- About Jones	      人生劇場\nF1 - 說明 - 本畫面\nF2 - 音樂 開/關 \nF3 - 音效 開/關 \nF4 - 目前玩家的統計 \nF5 - 儲存目前遊戲\nF6 - 檢視目標畫面\nF7 - 還原已儲存的遊戲\nF8 - 非必要訊息 開/關\nF9 - 重新開始遊戲\nF10- 關於瓊斯
+     JONES IN THE FAST LANE\nCtrl-Q - Quit\nCtrl-R - Change Reading Speed\nCtrl-S - Change Speed\nCtrl-T - Set Graphics Detail Level\nCtrl-V - Change Volume\nCtrl-Y - Set Save Directory\nCtrl-Z - Delete a Player\nEsc   - Menu Bar/Pauses Game\nLeft Mouse - Select\nMiddle Mouse/CTRL-Left - Goals\nRight Mouse/SHIFT-Left - Statistics	     人生劇場\nCtrl-Q - 離開\nCtrl-R - 變更閱讀速度\nCtrl-S - 變更遊戲速度\nCtrl-T - 設定圖形細節\nCtrl-V - 變更音量\nCtrl-Y - 設定存檔目錄\nCtrl-Z - 刪除玩家\nEsc   - 功能表列/暫停遊戲\n滑鼠左鍵 - 選擇\n滑鼠中鍵/Ctrl-左鍵 - 目標\n滑鼠右鍵/Shift-左鍵 - 統計
+Restarting?	重新開始？
+Quitting?	離開？
+Saving a game will overwrite a previously saved game.\nContinue?	儲存遊戲將覆蓋之前的\n存檔。繼續？
+Restore a saved game?	要還原存檔嗎？
+Non-essential\nmessages ON.	非必要\n訊息 開啟。
+Non-essential\nmessages OFF.	非必要\n訊息 關閉。
+Delete this player?	刪除此玩家？
+Another Statistics Screen is not allowed.	不允許再開啟統計畫面。
+Another Goals Screen is not allowed.	不允許再開啟目標畫面。
+%s\n[Collection of size %d]	%s\n[集合大小 %d]
+%s\n[List of size %d]	%s\n[清單大小 %d]
+%s\n[Set of size %d]	%s\n[集合大小 %d]
+Turn Music Off	關閉音樂
+Turn Music On	開啟音樂
+Turn Sound Effects Off	關閉音效
+Turn Sound Effects On	開啟音效
+Place	地點
+Player	玩家
+Restart	重新開始
+Quit	離開
+Player 1	玩家一
+Player 2	玩家二
+Player 3	玩家三
+Player 4	玩家四
+Talker	說話者
+Goods	商品
+Consumable	消耗品
+Durable	耐用品
+Educational	教育用品
+Consumables	消耗品
+Durables	耐用品
+Education	教育
+Continue	繼續
+Pay rent for 1 month.  	繳納一個月房租。
+Ask For More Time.       	要求延期。
+Rent Low-Cost Apartment  	租住低價公寓
+Rent Security Apartment  	租住保安公寓
+Pay Garnishment Balance  	償還扣押餘額
+Food For 1 Week....	食物 一週份
+Food For 2 Weeks..|	食物 兩週份
+Food For 4 Weeks..	食物 四週份
+10 Lottery Tickets|...|	10 張樂透彩票
+Newspaper................|	報紙
+Deposit  	存款
+Withdraw  	提款
+Loan Payment	償還貸款
+Apply For Loan	申請貸款
+See The Broker	找證券營業員
+Z-Mart Discount	Z-超商優惠
+Monolith Burgers	大石頭漢堡
+Socket City Appliance	多插座城市電器
+Hi-Tech University	高等技術大學
+Enrollment Fee 	報名費
+Refrigerator|.......	冰箱
+Freezer|..............|	冷凍庫
+Stove.................|	爐灶
+Color TV.............	彩色電視
+Stereo................|	立體音響
+Microwave..........|	微波爐
+Hot Tub..............	浴缸
+Computer............	電腦
+Business Suit  |	商務西裝
+Dress Clothes  |	禮服
+Hamburgers.........	漢堡
+Cheeseburger.......|	起司漢堡
+Astro Chicken.......|	太空雞
+Fries....................	薯條
+Shakes.................|	奶昔
+Colas...................|	可樂
