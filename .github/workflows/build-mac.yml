@@ -66,11 +66,14 @@ jobs:
             ./configure --disable-all-engines --enable-engine=sci --disable-mt32emu \
                         --enable-release --with-sdl-prefix="$P" >/tmp/sv_conf.log 2>&1 || { tail -40 /tmp/sv_conf.log; exit 1; }
           grep -iE 'Backend|engines to|SDL' /tmp/sv_conf.log | head
-          echo "$(date +%H:%M:%S) make"
+          echo "$(date +%H:%M:%S) make(動態,不用 scummvm-static:它要 libz.a/libbz2.a 靜態庫 brew 沒給)"
           make -j$(sysctl -n hw.ncpu) >/tmp/sv_make.log 2>&1 || { tail -50 /tmp/sv_make.log; exit 1; }
-          echo "$(date +%H:%M:%S) make bundle"
-          make bundle >/tmp/sv_bundle.log 2>&1 || { tail -40 /tmp/sv_bundle.log; exit 1; }
-          echo "$(date +%H:%M:%S) bundle done"
+          echo "$(date +%H:%M:%S) make bundle-pack(只建 .app 骨架:Info.plist/icon/themes/enginedata)"
+          make bundle-pack >/tmp/sv_bundle.log 2>&1 || { tail -40 /tmp/sv_bundle.log; exit 1; }
+          # 手動把「動態」scummvm binary 塞進 .app(bundle target 原本 cp 的是 scummvm-static)
+          cp scummvm ScummVM.app/Contents/MacOS/scummvm
+          chmod 755 ScummVM.app/Contents/MacOS/scummvm
+          echo "$(date +%H:%M:%S) bundle-pack done"; ls -la ScummVM.app/Contents/MacOS/
 
       - name: Assemble .app (bundle dylibs) + CHT data + dmg/tar.gz
         run: |
@@ -92,6 +95,9 @@ jobs:
           # 斷言:SDL2 有被打包 + 是真 SDL2(非 shim)
           test -f "$A/Contents/Frameworks/libSDL2-2.0.0.dylib" || { echo "ERROR: SDL2 未被打包(玩家端會黑畫面)"; exit 1; }
           otool -L "$A/Contents/Frameworks/libSDL2-2.0.0.dylib" | grep -qi SDL3 && { echo "ERROR: shim"; exit 1; } || true
+          # dylibbundler 改過 install_name → 必須 ad-hoc 重簽整個 .app,否則 Gatekeeper/載入失敗
+          echo "$(date +%H:%M:%S) codesign ad-hoc"
+          codesign --force --deep -s - "$A" || true
           # CHT 資料
           mkdir -p "$A/Contents/Resources/cht"; cp dist/game-cht/* "$A/Contents/Resources/cht/"
           cp -R dist/game-cht stage/cht
